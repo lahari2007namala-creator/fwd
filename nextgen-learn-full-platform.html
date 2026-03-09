@@ -1,0 +1,2377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXTGEN Learning Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050810;
+    --surface: #0a0f1e;
+    --card: #0d1424;
+    --border: #1a2540;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --accent4: #f59e0b;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --glow: 0 0 20px rgba(0,212,255,0.3);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { background:#050810!important; }
+  body { background: var(--bg); color: var(--text); font-family: 'Rajdhani', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--accent2); border-radius: 3px; }
+
+  /* GRID BG */
+  body::before {
+    content:''; position:fixed; inset:0; z-index:0;
+    background-image: linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top:0; left:0; right:0; z-index:1000;
+    background: rgba(5,8,16,0.95); backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo {
+    font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 1.4rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 3px;
+  }
+  .logo span { color: var(--accent3); -webkit-text-fill-color: var(--accent3); font-size: 0.7rem; display:block; letter-spacing:5px; font-weight:400; margin-top:-4px;}
+  .nav-links { display:flex; gap:0.5rem; align-items:center; }
+  .nav-btn {
+    background: none; border: 1px solid transparent; color: var(--muted);
+    padding: 6px 16px; border-radius: 6px; cursor:pointer;
+    font-family: 'Rajdhani', sans-serif; font-size: 0.9rem; font-weight:600;
+    letter-spacing:1px; transition: all 0.2s;
+  }
+  .nav-btn:hover, .nav-btn.active { color: var(--accent); border-color: var(--accent); background: rgba(0,212,255,0.05); }
+  .nav-btn.cta { background: var(--accent2); border-color: var(--accent2); color: white; }
+  .nav-btn.cta:hover { background: #6d28d9; }
+
+  /* SEARCH BAR */
+  .search-wrap {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 14px; flex:1; max-width: 380px; margin: 0 1rem;
+  }
+  .search-wrap input {
+    background: none; border: none; outline: none; color: var(--text);
+    font-family: 'Rajdhani', sans-serif; font-size: 0.95rem; width:100%;
+  }
+  .search-wrap input::placeholder { color: var(--muted); }
+  .search-icon { color: var(--accent); font-size:1rem; }
+
+  /* PAGES */
+  .page { display:none; padding-top: 80px; min-height:100vh; position:relative; z-index:1; }
+  .page.active { display:block; }
+
+  /* HERO */
+  .hero {
+    padding: 4rem 2rem 2rem; text-align:center;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(124,58,237,0.15) 0%, transparent 70%);
+  }
+  .hero-title {
+    font-family: 'Orbitron', sans-serif; font-size: clamp(2.5rem,6vw,5rem);
+    font-weight: 900; letter-spacing: 6px; line-height:1;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-sub { color: var(--muted); font-size:1.1rem; margin: 1rem 0 2rem; letter-spacing:2px; }
+  .hero-stats { display:flex; gap:2rem; justify-content:center; flex-wrap:wrap; margin: 2rem 0; }
+  .stat { text-align:center; }
+  .stat-num { font-family:'Orbitron',sans-serif; font-size:2rem; font-weight:700; color:var(--accent); }
+  .stat-label { color:var(--muted); font-size:0.8rem; letter-spacing:2px; }
+  .hero-btns { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-top:2rem; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border: none; color:white; padding: 12px 32px; border-radius:8px;
+    font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
+    letter-spacing:2px; cursor:pointer; transition:all 0.3s;
+  }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow: 0 8px 30px rgba(0,212,255,0.3); }
+  .btn-outline {
+    background: none; border: 1px solid var(--accent); color:var(--accent);
+    padding: 12px 32px; border-radius:8px;
+    font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
+    letter-spacing:2px; cursor:pointer; transition:all 0.3s;
+  }
+  .btn-outline:hover { background: rgba(0,212,255,0.1); }
+
+  /* CARDS GRID */
+  .section { padding: 2rem; max-width:1400px; margin:0 auto; }
+  .section-title {
+    font-family:'Orbitron',sans-serif; font-size:1.2rem; font-weight:700;
+    color:var(--accent); letter-spacing:3px; margin-bottom:1.5rem;
+    display:flex; align-items:center; gap:12px;
+  }
+  .section-title::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,var(--border),transparent); }
+  .cards-grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap:1.2rem; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius:12px;
+    padding:1.4rem; cursor:pointer; transition:all 0.3s; position:relative; overflow:hidden;
+  }
+  .card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    opacity:0; transition:opacity 0.3s;
+  }
+  .card:hover { border-color:var(--accent); transform:translateY(-3px); box-shadow: var(--glow); }
+  .card:hover::before { opacity:1; }
+  .card-icon { font-size:2rem; margin-bottom:0.8rem; }
+  .card-title { font-family:'Orbitron',sans-serif; font-size:0.85rem; font-weight:700; color:var(--text); letter-spacing:1px; margin-bottom:0.4rem; }
+  .card-desc { color:var(--muted); font-size:0.85rem; line-height:1.5; }
+  .card-badge {
+    display:inline-block; padding:2px 10px; border-radius:20px; font-size:0.7rem; font-weight:600;
+    letter-spacing:1px; margin-top:0.8rem;
+  }
+  .badge-cse { background:rgba(0,212,255,0.15); color:var(--accent); border:1px solid rgba(0,212,255,0.3); }
+  .badge-csit { background:rgba(124,58,237,0.15); color:#a78bfa; border:1px solid rgba(124,58,237,0.3); }
+  .badge-ai { background:rgba(245,158,11,0.15); color:var(--accent4); border:1px solid rgba(245,158,11,0.3); }
+  .badge-prog { background:rgba(16,185,129,0.15); color:var(--accent3); border:1px solid rgba(16,185,129,0.3); }
+
+  /* SUBJECT PAGE */
+  .page-header {
+    padding: 2rem 2rem 1rem; border-bottom: 1px solid var(--border);
+    display:flex; align-items:center; gap:1rem;
+  }
+  .back-btn {
+    background:none; border:1px solid var(--border); color:var(--muted);
+    padding:6px 14px; border-radius:6px; cursor:pointer;
+    font-family:'Rajdhani',sans-serif; font-size:0.9rem; transition:all 0.2s;
+  }
+  .back-btn:hover { color:var(--accent); border-color:var(--accent); }
+  .page-title { font-family:'Orbitron',sans-serif; font-size:1.4rem; font-weight:700; }
+
+  /* TOPIC CONTENT */
+  .topic-layout { display:grid; grid-template-columns:280px 1fr; gap:0; min-height:calc(100vh - 140px); }
+  .sidebar {
+    background: var(--surface); border-right:1px solid var(--border);
+    padding:1.2rem; overflow-y:auto; max-height:calc(100vh - 140px); position:sticky; top:140px;
+  }
+  .sidebar-title { font-size:0.7rem; letter-spacing:3px; color:var(--muted); margin-bottom:1rem; font-weight:700; }
+  .topic-item {
+    padding:8px 12px; border-radius:6px; cursor:pointer; margin-bottom:4px;
+    font-size:0.9rem; font-weight:500; transition:all 0.2s; color:var(--muted);
+    border:1px solid transparent;
+  }
+  .topic-item:hover { color:var(--text); background:var(--card); }
+  .topic-item.active { color:var(--accent); background:rgba(0,212,255,0.08); border-color:rgba(0,212,255,0.2); }
+  .topic-item .sub-label { font-size:0.7rem; letter-spacing:1px; color:var(--accent3); }
+
+  .content-area { padding:2rem; overflow-y:auto; }
+  .content-block { display:none; }
+  .content-block.active { display:block; }
+
+  .topic-title { font-family:'Orbitron',sans-serif; font-size:1.3rem; font-weight:700; color:var(--accent); margin-bottom:0.5rem; }
+  .topic-subtitle { color:var(--muted); font-size:0.9rem; letter-spacing:1px; margin-bottom:1.5rem; }
+
+  .info-box {
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:1.4rem; margin-bottom:1.2rem;
+  }
+  .info-box h3 { font-family:'Orbitron',sans-serif; font-size:0.85rem; color:var(--accent3); letter-spacing:2px; margin-bottom:0.8rem; }
+  .info-box p, .info-box li { font-size:0.95rem; line-height:1.7; color:var(--text); }
+  .info-box ul { padding-left:1.2rem; }
+  .info-box li { margin-bottom:0.3rem; }
+
+  .logic-box {
+    background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(0,212,255,0.05));
+    border:1px solid rgba(124,58,237,0.3); border-radius:10px; padding:1.4rem; margin-bottom:1.2rem;
+  }
+  .logic-box h3 { font-family:'Orbitron',sans-serif; font-size:0.85rem; color:#a78bfa; letter-spacing:2px; margin-bottom:0.8rem; }
+
+  .qa-box { margin-bottom:1rem; }
+  .qa-q {
+    background:rgba(0,212,255,0.06); border:1px solid rgba(0,212,255,0.2);
+    border-radius:8px 8px 0 0; padding:12px 16px;
+    font-weight:600; font-size:0.95rem; color:var(--accent); cursor:pointer;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .qa-a {
+    background:var(--card); border:1px solid rgba(0,212,255,0.2); border-top:none;
+    border-radius:0 0 8px 8px; padding:12px 16px;
+    font-size:0.9rem; line-height:1.7; color:var(--text); display:none;
+  }
+  .qa-a.open { display:block; }
+
+  /* AI HUB */
+  .ai-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1.2rem; margin-top:1rem; }
+  .ai-card {
+    background:linear-gradient(135deg, rgba(245,158,11,0.05), rgba(124,58,237,0.08));
+    border:1px solid rgba(245,158,11,0.2); border-radius:12px; padding:1.4rem;
+    transition:all 0.3s; cursor:pointer;
+  }
+  .ai-card:hover { border-color:var(--accent4); transform:translateY(-3px); }
+  .ai-card-icon { font-size:2.5rem; margin-bottom:0.8rem; }
+  .ai-card-title { font-family:'Orbitron',sans-serif; font-size:0.9rem; color:var(--accent4); letter-spacing:1px; margin-bottom:0.5rem; }
+  .ai-card-desc { color:var(--muted); font-size:0.85rem; line-height:1.6; }
+
+  /* PROGRAM PRACTICE */
+  .prog-layout { display:grid; grid-template-columns:220px 1fr; gap:0; }
+  .lang-sidebar { background:var(--surface); border-right:1px solid var(--border); padding:1rem; }
+  .lang-btn {
+    width:100%; text-align:left; background:none; border:1px solid transparent;
+    color:var(--muted); padding:10px 14px; border-radius:8px; cursor:pointer;
+    font-family:'Rajdhani',sans-serif; font-size:0.95rem; font-weight:600;
+    margin-bottom:4px; transition:all 0.2s; display:flex; align-items:center; gap:8px;
+  }
+  .lang-btn:hover { color:var(--text); background:var(--card); }
+  .lang-btn.active { color:var(--accent3); background:rgba(16,185,129,0.08); border-color:rgba(16,185,129,0.2); }
+  .lang-dot { width:8px; height:8px; border-radius:50%; }
+  .dot-py { background:#3b82f6; }
+  .dot-java { background:#f59e0b; }
+  .dot-c { background:#64748b; }
+  .dot-cpp { background:#8b5cf6; }
+  .dot-html { background:#f97316; }
+  .dot-css { background:#06b6d4; }
+  .dot-js { background:#eab308; }
+
+  .editor-area { padding:1.5rem; }
+  .editor-header { display:flex; align-items:center; gap:1rem; margin-bottom:1rem; flex-wrap:wrap; }
+  .editor-lang { font-family:'Orbitron',sans-serif; font-size:1rem; font-weight:700; color:var(--accent3); }
+  .run-btn {
+    background:var(--accent3); border:none; color:black; padding:8px 24px;
+    border-radius:6px; font-family:'Rajdhani',sans-serif; font-size:0.9rem;
+    font-weight:700; letter-spacing:1px; cursor:pointer; transition:all 0.2s;
+  }
+  .run-btn:hover { background:#059669; }
+  .run-btn:disabled { background:var(--muted); cursor:not-allowed; opacity:0.5; }
+  .deploy-note {
+    background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3);
+    border-radius:6px; padding:8px 14px; font-size:0.8rem; color:var(--accent4);
+  }
+  .no-run-note {
+    background:rgba(100,116,139,0.1); border:1px solid rgba(100,116,139,0.3);
+    border-radius:6px; padding:8px 14px; font-size:0.8rem; color:var(--muted);
+  }
+  .code-editor {
+    background:#010409; border:1px solid var(--border); border-radius:10px;
+    padding:1rem; font-family:'JetBrains Mono',monospace; font-size:0.85rem;
+    color:#e2e8f0; min-height:320px; width:100%; resize:vertical;
+    outline:none; line-height:1.7;
+  }
+  .output-box {
+    background:#010409; border:1px solid var(--border); border-radius:8px;
+    padding:1rem; margin-top:1rem; font-family:'JetBrains Mono',monospace;
+    font-size:0.85rem; color:var(--accent3); min-height:100px; white-space:pre-wrap;
+  }
+  .output-label { color:var(--muted); font-size:0.7rem; letter-spacing:2px; margin-bottom:0.5rem; }
+
+  /* SEARCH PAGE */
+  .search-page { padding:2rem; max-width:900px; margin:0 auto; }
+  .big-search {
+    display:flex; gap:0; margin-bottom:2rem;
+    background:var(--card); border:1px solid var(--border); border-radius:10px; overflow:hidden;
+  }
+  .big-search input {
+    flex:1; background:none; border:none; outline:none; color:var(--text);
+    font-family:'Rajdhani',sans-serif; font-size:1rem; padding:14px 18px;
+  }
+  .big-search button {
+    background:var(--accent2); border:none; color:white; padding:14px 24px;
+    font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700; cursor:pointer;
+    transition:background 0.2s;
+  }
+  .big-search button:hover { background:#6d28d9; }
+  .search-filter { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+  .filter-btn {
+    background:var(--card); border:1px solid var(--border); color:var(--muted);
+    padding:6px 14px; border-radius:20px; font-family:'Rajdhani',sans-serif;
+    font-size:0.85rem; cursor:pointer; transition:all 0.2s;
+  }
+  .filter-btn:hover, .filter-btn.active { color:var(--accent); border-color:var(--accent); background:rgba(0,212,255,0.08); }
+  .search-result {
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:1.4rem; margin-bottom:1rem; transition:all 0.2s;
+  }
+  .search-result:hover { border-color:var(--accent); }
+  .result-tag { font-size:0.7rem; letter-spacing:2px; color:var(--accent3); margin-bottom:0.4rem; font-weight:700; }
+  .result-title { font-size:1.1rem; font-weight:700; color:var(--text); margin-bottom:0.4rem; }
+  .result-desc { color:var(--muted); font-size:0.9rem; line-height:1.5; }
+
+  /* RICH SEARCH RESULT CARD */
+  .rich-result {
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    overflow:hidden; margin-bottom:1.5rem; animation: fadeIn 0.3s ease;
+  }
+  .rich-result-header {
+    padding:1.2rem 1.6rem; border-bottom:1px solid var(--border);
+    background: linear-gradient(135deg, rgba(0,212,255,0.05), rgba(124,58,237,0.05));
+    display:flex; align-items:center; gap:12px;
+  }
+  .rich-result-icon { font-size:1.8rem; }
+  .rich-result-title { font-family:'Orbitron',sans-serif; font-size:1.1rem; font-weight:700; color:var(--accent); letter-spacing:1px; }
+  .rich-result-tag { font-size:0.7rem; letter-spacing:2px; color:var(--accent3); font-weight:700; margin-top:2px; }
+
+  .rich-section { padding:1.2rem 1.6rem; border-bottom:1px solid rgba(26,37,64,0.6); }
+  .rich-section:last-child { border-bottom:none; }
+  .rich-section-label {
+    font-family:'Orbitron',sans-serif; font-size:0.7rem; letter-spacing:3px;
+    color:var(--accent2); margin-bottom:0.7rem; font-weight:700;
+    display:flex; align-items:center; gap:8px;
+  }
+  .rich-section-label::after { content:''; flex:1; height:1px; background:rgba(124,58,237,0.2); }
+  .rich-desc { font-size:0.95rem; line-height:1.75; color:var(--text); }
+
+  .algo-steps { list-style:none; padding:0; counter-reset:step; }
+  .algo-steps li {
+    counter-increment:step; display:flex; gap:12px; align-items:flex-start;
+    margin-bottom:0.6rem; font-size:0.92rem; line-height:1.6; color:var(--text);
+  }
+  .algo-steps li::before {
+    content: counter(step); min-width:24px; height:24px; border-radius:50%;
+    background:var(--accent2); color:white; font-size:0.75rem; font-weight:700;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px;
+  }
+
+  .lang-select-wrap { display:flex; gap:0.5rem; margin-bottom:0.8rem; flex-wrap:wrap; }
+  .lang-tab {
+    background:var(--surface); border:1px solid var(--border); color:var(--muted);
+    padding:5px 14px; border-radius:6px; cursor:pointer;
+    font-family:'JetBrains Mono',monospace; font-size:0.8rem; transition:all 0.2s;
+  }
+  .lang-tab:hover { color:var(--accent3); border-color:var(--accent3); }
+  .lang-tab.active { background:rgba(16,185,129,0.12); color:var(--accent3); border-color:var(--accent3); }
+  .code-block {
+    background:#010409; border:1px solid var(--border); border-radius:8px;
+    padding:1rem 1.2rem; font-family:'JetBrains Mono',monospace; font-size:0.82rem;
+    color:#e2e8f0; line-height:1.75; overflow-x:auto; white-space:pre; display:none;
+  }
+  .code-block.active { display:block; }
+
+  .complexity-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; }
+  .complexity-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1rem;
+    text-align:center;
+  }
+  .complexity-label { font-size:0.7rem; letter-spacing:2px; color:var(--muted); margin-bottom:0.4rem; font-weight:700; }
+  .complexity-value { font-family:'Orbitron',sans-serif; font-size:1.1rem; font-weight:700; color:var(--accent4); }
+  .complexity-note { font-size:0.75rem; color:var(--muted); margin-top:0.3rem; }
+
+  .eq-list { display:flex; flex-direction:column; gap:0.6rem; }
+  .eq-item {
+    background:rgba(0,212,255,0.04); border:1px solid rgba(0,212,255,0.15);
+    border-radius:8px 8px 0 0; overflow:hidden;
+  }
+  .eq-q {
+    padding:10px 14px; font-size:0.9rem; font-weight:600; color:var(--accent);
+    cursor:pointer; display:flex; justify-content:space-between; align-items:center;
+    user-select:none;
+  }
+  .eq-a {
+    background:var(--card); border-top:1px solid rgba(0,212,255,0.12);
+    padding:10px 14px; font-size:0.88rem; line-height:1.7; color:var(--text); display:none;
+    border-radius:0 0 8px 8px;
+  }
+  .eq-a.open { display:block; }
+
+  .no-result-box {
+    text-align:center; padding:3rem 1rem; color:var(--muted);
+  }
+  .no-result-box .nr-icon { font-size:3rem; margin-bottom:1rem; }
+  .no-result-box p { font-size:0.95rem; line-height:1.7; }
+  .search-hint { display:flex; flex-wrap:wrap; gap:0.5rem; justify-content:center; margin-top:1rem; }
+  .hint-chip {
+    background:var(--card); border:1px solid var(--border); color:var(--accent);
+    padding:5px 14px; border-radius:20px; font-size:0.82rem; cursor:pointer; transition:all 0.2s;
+  }
+  .hint-chip:hover { background:rgba(0,212,255,0.08); border-color:var(--accent); }
+
+  /* YEAR TABS */
+  .year-tabs { display:flex; gap:0.5rem; margin-bottom:1.5rem; flex-wrap:wrap; }
+  .year-tab {
+    background:var(--card); border:1px solid var(--border); color:var(--muted);
+    padding:8px 20px; border-radius:8px; cursor:pointer;
+    font-family:'Orbitron',sans-serif; font-size:0.75rem; letter-spacing:1px;
+    transition:all 0.2s;
+  }
+  .year-tab:hover { color:var(--accent); border-color:var(--accent); }
+  .year-tab.active { background:var(--accent2); color:white; border-color:var(--accent2); }
+
+  /* BRANCH TABS */
+  .branch-tabs { display:flex; gap:0.5rem; margin-bottom:1.5rem; }
+  .branch-tab {
+    background:var(--card); border:1px solid var(--border); color:var(--muted);
+    padding:8px 24px; border-radius:8px; cursor:pointer;
+    font-family:'Rajdhani',sans-serif; font-size:0.95rem; font-weight:600; letter-spacing:1px;
+    transition:all 0.2s;
+  }
+  .branch-tab.active-cse { background:rgba(0,212,255,0.15); color:var(--accent); border-color:var(--accent); }
+  .branch-tab.active-csit { background:rgba(124,58,237,0.15); color:#a78bfa; border-color:#7c3aed; }
+
+  /* RESPONSIVE */
+  @media(max-width:768px){
+    .topic-layout, .prog-layout { grid-template-columns:1fr; }
+    .sidebar, .lang-sidebar { max-height:200px; position:static; }
+    .nav-links { display:none; }
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeIn { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+  .page.active { animation: fadeIn 0.3s ease; }
+
+  
+  
+
+  .tag-new { background:var(--accent3); color:black; font-size:0.65rem; padding:2px 6px; border-radius:4px; font-weight:700; margin-left:6px; }
+
+  /* QUIZ */
+  .quiz-box { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:1rem; }
+  .quiz-q { font-size:1rem; font-weight:600; color:var(--text); margin-bottom:1rem; }
+  .quiz-opts { display:flex; flex-direction:column; gap:0.5rem; }
+  .quiz-opt {
+    background:var(--surface); border:1px solid var(--border); border-radius:8px;
+    padding:10px 16px; cursor:pointer; font-size:0.9rem; transition:all 0.2s;
+  }
+  .quiz-opt:hover { border-color:var(--accent); color:var(--accent); }
+  .quiz-opt.correct { background:rgba(16,185,129,0.15); border-color:var(--accent3); color:var(--accent3); }
+  .quiz-opt.wrong { background:rgba(239,68,68,0.1); border-color:#ef4444; color:#ef4444; }
+
+  /* LOGIN MODAL */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:2000; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:2rem; width:100%; max-width:400px; }
+  .modal-title { font-family:'Orbitron',sans-serif; font-size:1.2rem; color:var(--accent); margin-bottom:1.5rem; }
+  .form-group { margin-bottom:1rem; }
+  .form-label { font-size:0.8rem; letter-spacing:2px; color:var(--muted); margin-bottom:6px; display:block; font-weight:600; }
+  .form-input {
+    width:100%; background:var(--surface); border:1px solid var(--border); border-radius:8px;
+    padding:10px 14px; color:var(--text); font-family:'Rajdhani',sans-serif; font-size:0.95rem; outline:none;
+  }
+  .form-input:focus { border-color:var(--accent); }
+  .modal-btns { display:flex; gap:0.8rem; margin-top:1.5rem; }
+  .modal-close { background:none; border:1px solid var(--border); color:var(--muted); padding:10px 20px; border-radius:8px; cursor:pointer; font-family:'Rajdhani',sans-serif; }
+
+  .secondary-btn {
+    background:none; border:1px solid var(--accent4); color:var(--accent4); padding:8px 18px;
+    border-radius:6px; font-family:'Rajdhani',sans-serif; font-size:0.9rem; font-weight:700;
+    letter-spacing:1px; cursor:pointer; transition:all 0.2s;
+  }
+  .secondary-btn:hover { background: rgba(245,158,11,0.08); }
+  .preview-modal {
+    display:none; position:fixed; inset:0; z-index:2200; background:rgba(1,4,9,0.92);
+    align-items:center; justify-content:center; padding:2rem;
+  }
+  .preview-modal.open { display:flex; }
+  .preview-shell {
+    width:min(1100px, 96vw); height:min(760px, 90vh); background:var(--surface);
+    border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:var(--glow);
+    display:flex; flex-direction:column;
+  }
+  .preview-topbar {
+    display:flex; align-items:center; justify-content:space-between; padding:0.9rem 1rem;
+    border-bottom:1px solid var(--border); background:rgba(5,8,16,0.95);
+  }
+  .preview-title { font-family:'Orbitron',sans-serif; font-size:0.8rem; letter-spacing:2px; color:var(--accent); }
+  .preview-close {
+    background:none; border:1px solid var(--border); color:var(--muted); padding:6px 12px; border-radius:8px;
+    cursor:pointer; font-family:'Rajdhani',sans-serif; font-weight:700;
+  }
+  .preview-close:hover { color:var(--accent); border-color:var(--accent); }
+  .preview-frame { flex:1; width:100%; border:none; background:white; }
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">NEXTGEN<span>LEARNING PLATFORM</span></div>
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="globalSearch" placeholder="Search any topic, concept, question..." onkeydown="if(event.key==='Enter')doSearch()">
+  </div>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="showPage('home')">Home</button>
+    <button class="nav-btn" onclick="showPage('subjects')">Subjects</button>
+    <button class="nav-btn" onclick="showPage('aihub')">AI Hub</button>
+    <button class="nav-btn" onclick="showPage('practice')">Practice</button>
+    <button class="nav-btn" onclick="showPage('search')">Search</button>
+    <button class="nav-btn cta" onclick="openModal()">Register</button>
+  </div>
+</nav>
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-title">CREATE ACCOUNT</div>
+    <div class="form-group">
+      <label class="form-label">FULL NAME</label>
+      <input class="form-input" type="text" placeholder="Your name">
+    </div>
+    <div class="form-group">
+      <label class="form-label">EMAIL</label>
+      <input class="form-input" type="email" placeholder="college@email.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">BRANCH</label>
+      <select class="form-input">
+        <option>CSE - Computer Science Engineering</option>
+        <option>CS&IT - Computer Science & Information Technology</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">YEAR</label>
+      <select class="form-input">
+        <option>1st Year</option><option>2nd Year</option>
+        <option>3rd Year</option><option>4th Year</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">PASSWORD</label>
+      <input class="form-input" type="password" placeholder="Create password">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="closeModal()" style="flex:1">REGISTER</button>
+      <button class="modal-close" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOME PAGE -->
+<div id="home" class="page active">
+  <div class="hero">
+    <div class="hero-title">NEXTGEN LEARNING PLATFORM</div>
+    <div class="hero-sub">LEARNING PLATFORM · CSE & CS&IT</div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">4</div><div class="stat-label">YEARS</div></div>
+      <div class="stat"><div class="stat-num">60+</div><div class="stat-label">SUBJECTS</div></div>
+      <div class="stat"><div class="stat-num">800+</div><div class="stat-label">TOPICS</div></div>
+      <div class="stat"><div class="stat-num">1500+</div><div class="stat-label">PREDICTED Qs</div></div>
+      <div class="stat"><div class="stat-num">8</div><div class="stat-label">LANGUAGES</div></div>
+    </div>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="showPage('subjects')">EXPLORE SUBJECTS</button>
+      <button class="btn-outline" onclick="showPage('aihub')">AI HUB</button>
+      <button class="btn-outline" onclick="showPage('practice')">PRACTICE CODE</button>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">QUICK ACCESS</div>
+    <div class="cards-grid">
+      <div class="card" onclick="showPage('subjects')">
+        <div class="card-icon">📚</div>
+        <div class="card-title">ALL SUBJECTS</div>
+        <div class="card-desc">Access complete subject materials for all 4 years including summaries, topics, Q&A, and logic explanations.</div>
+        <span class="card-badge badge-cse">CSE</span> <span class="card-badge badge-csit">CS&IT</span>
+      </div>
+      <div class="card" onclick="showPage('aihub')">
+        <div class="card-icon">🤖</div>
+        <div class="card-title">AI HUB</div>
+        <div class="card-desc">Deep dive into AI Foundations, ML, Deep Learning, NLP, Computer Vision, and Reinforcement Learning.</div>
+        <span class="card-badge badge-ai">AI / ML</span>
+      </div>
+      <div class="card" onclick="showPage('practice')">
+        <div class="card-icon">💻</div>
+        <div class="card-title">PROGRAM PRACTICE</div>
+        <div class="card-desc">Write and run Python, Java, C, C++ in browser. HTML, CSS, JS now include live preview inside the platform.</div>
+        <span class="card-badge badge-prog">CODE</span>
+      </div>
+      <div class="card" onclick="showPage('search')">
+        <div class="card-icon">🔍</div>
+        <div class="card-title">SMART SEARCH</div>
+        <div class="card-desc">Search any concept, topic, or question across all subjects, years, and branches. Get instant answers.</div>
+        <span class="card-badge badge-cse">ALL TOPICS</span>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">FEATURED SUBJECTS</div>
+    <div class="cards-grid">
+      <div class="card" onclick="showSubject('ds')"><div class="card-icon">🧩</div><div class="card-title">DATA STRUCTURES</div><div class="card-desc">Arrays, Linked Lists, Trees, Graphs, Stacks, Queues — complete with logic building.</div><span class="card-badge badge-cse">2nd Year</span></div>
+      <div class="card" onclick="showSubject('os')"><div class="card-icon">⚙️</div><div class="card-title">OPERATING SYSTEMS</div><div class="card-desc">Processes, Scheduling, Memory Management, File Systems, Deadlocks.</div><span class="card-badge badge-cse">3rd Year</span></div>
+      <div class="card" onclick="showSubject('dbms')"><div class="card-icon">🗄️</div><div class="card-title">DBMS</div><div class="card-desc">ER models, SQL, Normalization, Transactions, Indexing — simplified.</div><span class="card-badge badge-cse">2nd Year</span></div>
+      <div class="card" onclick="showSubject('cn')"><div class="card-icon">🌐</div><div class="card-title">COMPUTER NETWORKS</div><div class="card-desc">OSI model, TCP/IP, Routing, Subnetting, Protocols explained clearly.</div><span class="card-badge badge-cse">3rd Year</span></div>
+      <div class="card" onclick="showSubject('algo')"><div class="card-icon">📊</div><div class="card-title">ALGORITHMS</div><div class="card-desc">Sorting, Searching, Dynamic Programming, Greedy — with step-by-step logic.</div><span class="card-badge badge-cse">2nd Year</span></div>
+      <div class="card" onclick="showSubject('oops')"><div class="card-icon">🔷</div><div class="card-title">OOP CONCEPTS</div><div class="card-desc">Classes, Inheritance, Polymorphism, Encapsulation, Abstraction with real examples.</div><span class="card-badge badge-cse">1st Year</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SUBJECTS PAGE -->
+<div id="subjects" class="page">
+  <div class="section">
+    <div class="section-title">ALL SUBJECTS BY YEAR</div>
+    <div class="branch-tabs">
+      <button class="branch-tab active-cse" onclick="setBranch('cse',this)">CSE</button>
+      <button class="branch-tab" onclick="setBranch('csit',this)">CS&IT</button>
+    </div>
+    <div class="year-tabs">
+      <button class="year-tab active" onclick="setYear('1',this)">1st YEAR</button>
+      <button class="year-tab" onclick="setYear('2',this)">2nd YEAR</button>
+      <button class="year-tab" onclick="setYear('3',this)">3rd YEAR</button>
+      <button class="year-tab" onclick="setYear('4',this)">4th YEAR</button>
+    </div>
+    <div id="subjectCards" class="cards-grid"></div>
+  </div>
+</div>
+
+<!-- SUBJECT DETAIL PAGE -->
+<div id="subjectDetail" class="page">
+  <div class="page-header">
+    <button class="back-btn" onclick="showPage('subjects')">← Back</button>
+    <div class="page-title" id="subjectDetailTitle">Data Structures</div>
+  </div>
+  <div class="topic-layout">
+    <div class="sidebar" id="topicSidebar"></div>
+    <div class="content-area" id="topicContent"></div>
+  </div>
+</div>
+
+<!-- AI HUB PAGE -->
+<div id="aihub" class="page">
+  <div class="section">
+    <div class="section-title">AI HUB — ARTIFICIAL INTELLIGENCE LEARNING CENTER</div>
+    <div class="ai-grid">
+      <div class="ai-card" onclick="showAITopic('foundations')">
+        <div class="ai-card-icon">🧠</div>
+        <div class="ai-card-title">AI FOUNDATIONS</div>
+        <div class="ai-card-desc">History of AI, Turing Test, Intelligent Agents, Problem Solving, Search Algorithms, Knowledge Representation.</div>
+      </div>
+      <div class="ai-card" onclick="showAITopic('ml')">
+        <div class="ai-card-icon">📈</div>
+        <div class="ai-card-title">MACHINE LEARNING</div>
+        <div class="ai-card-desc">Supervised, Unsupervised, Reinforcement Learning, Regression, Classification, Clustering, Feature Engineering.</div>
+      </div>
+      <div class="ai-card" onclick="showAITopic('dl')">
+        <div class="ai-card-icon">🔬</div>
+        <div class="ai-card-title">DEEP LEARNING</div>
+        <div class="ai-card-desc">Neural Networks, CNN, RNN, LSTM, Transformers, Backpropagation, Activation Functions, Optimization.</div>
+      </div>
+      <div class="ai-card" onclick="showAITopic('nlp')">
+        <div class="ai-card-icon">💬</div>
+        <div class="ai-card-title">NATURAL LANGUAGE PROCESSING</div>
+        <div class="ai-card-desc">Tokenization, POS Tagging, NER, Sentiment Analysis, Language Models, BERT, GPT, Text Generation.</div>
+      </div>
+      <div class="ai-card" onclick="showAITopic('cv')">
+        <div class="ai-card-icon">👁️</div>
+        <div class="ai-card-title">COMPUTER VISION</div>
+        <div class="ai-card-desc">Image Processing, Object Detection, YOLO, Image Segmentation, Face Recognition, OpenCV basics.</div>
+      </div>
+      <div class="ai-card" onclick="showAITopic('rl')">
+        <div class="ai-card-icon">🎮</div>
+        <div class="ai-card-title">REINFORCEMENT LEARNING</div>
+        <div class="ai-card-desc">Markov Decision Processes, Q-Learning, Policy Gradient, Deep RL, Actor-Critic, Real-world Applications.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI TOPIC DETAIL PAGE -->
+<div id="aitopicDetail" class="page">
+  <div class="page-header">
+    <button class="back-btn" onclick="showPage('aihub')">← Back</button>
+    <div class="page-title" id="aitopicTitle">AI Foundations</div>
+  </div>
+  <div class="topic-layout">
+    <div class="sidebar" id="aiSidebar"></div>
+    <div class="content-area" id="aiContent"></div>
+  </div>
+</div>
+
+<!-- PRACTICE PAGE -->
+<div id="practice" class="page">
+  <div class="section" style="padding-bottom:0.5rem">
+    <div class="section-title">PROGRAM PRACTICE</div>
+  </div>
+  <div class="prog-layout">
+    <div class="lang-sidebar">
+      <div class="sidebar-title">LANGUAGES</div>
+      <button class="lang-btn active" onclick="setLang('python',this)"><span class="lang-dot dot-py"></span>Python</button>
+      <button class="lang-btn" onclick="setLang('java',this)"><span class="lang-dot dot-java"></span>Java</button>
+      <button class="lang-btn" onclick="setLang('c',this)"><span class="lang-dot dot-c"></span>C</button>
+      <button class="lang-btn" onclick="setLang('cpp',this)"><span class="lang-dot dot-cpp"></span>C++</button>
+      <div style="margin:1rem 0 0.5rem;font-size:0.65rem;letter-spacing:2px;color:var(--muted);font-weight:700;">WEB (VIEW ONLY)</div>
+      <button class="lang-btn" onclick="setLang('html',this)"><span class="lang-dot dot-html"></span>HTML</button>
+      <button class="lang-btn" onclick="setLang('css',this)"><span class="lang-dot dot-css"></span>CSS</button>
+      <button class="lang-btn" onclick="setLang('js',this)"><span class="lang-dot dot-js"></span>JavaScript</button>
+      <div style="margin:1.5rem 0 0.5rem;font-size:0.65rem;letter-spacing:2px;color:var(--muted);font-weight:700;">DEPLOY</div>
+      <button class="lang-btn" onclick="alert('Opens VS Code — install VS Code extension or use github.dev')"><span>🔧</span>VS Code</button>
+      <button class="lang-btn" onclick="openGithub()"><span>🐙</span>GitHub</button>
+    </div>
+    <div class="editor-area">
+      <div class="editor-header">
+        <span class="editor-lang" id="editorLangLabel">Python</span>
+        <button class="run-btn" id="runBtn" onclick="runCode()">▶ RUN</button>
+        <button class="secondary-btn" id="previewBtn" onclick="openWebPreview()" style="display:none">PREVIEW</button>
+        <div id="deployNote"></div>
+        <div id="noRunNote"></div>
+      </div>
+      <div class="info-box" id="langInfo" style="margin-bottom:1rem"></div>
+      <textarea class="code-editor" id="codeEditor" spellcheck="false"></textarea>
+      <div class="output-label">OUTPUT</div>
+      <div class="output-box" id="outputBox">// Output will appear here after running code</div>
+    </div>
+  </div>
+</div>
+
+<!-- SEARCH PAGE -->
+<div id="search" class="page">
+  <div class="search-page">
+    <div class="section-title">SMART SEARCH</div>
+    <div class="big-search">
+      <input type="text" id="searchInput" placeholder="Search any topic, algorithm, concept... e.g. Binary Search, Stack, Pointer" onkeydown="if(event.key==='Enter')doSearch()">
+      <button onclick="doSearch()">SEARCH</button>
+    </div>
+    <div id="searchResults"></div>
+  </div>
+</div>
+
+
+<!-- WEB PREVIEW MODAL -->
+<div class="preview-modal" id="previewModal">
+  <div class="preview-shell">
+    <div class="preview-topbar">
+      <div class="preview-title">LIVE WEB PREVIEW</div>
+      <button class="preview-close" onclick="closeWebPreview()">Close</button>
+    </div>
+    <iframe class="preview-frame" id="previewFrame" title="Live Preview"></iframe>
+  </div>
+</div>
+
+<script>
+// ========================= DATA =========================
+
+const subjects = {
+  '1': {
+    cse: [
+      {id:'prog',title:'Programming in C',icon:'💾',desc:'Basics of C programming, pointers, arrays, functions, file handling and logic building.'},
+      {id:'maths1',title:'Engineering Mathematics I',icon:'📐',desc:'Differential Calculus, Matrices, Differential Equations.'},
+      {id:'oops',title:'OOP with Java/C++',icon:'🔷',desc:'Classes, Objects, Inheritance, Polymorphism, Encapsulation, Abstraction.'},
+      {id:'beee',title:'Basic Electrical Engineering',icon:'⚡',desc:'Circuits, Ohm\'s law, AC/DC, Transformers, Motors.'},
+      {id:'phy',title:'Engineering Physics',icon:'🔭',desc:'Wave Optics, Quantum Mechanics, Semiconductors, Lasers.'},
+      {id:'chem',title:'Engineering Chemistry',icon:'🧪',desc:'Polymer chemistry, Electrochemistry, Corrosion, Water treatment.'},
+    ],
+    csit: [
+      {id:'prog',title:'Programming in C',icon:'💾',desc:'Basics of C programming, pointers, arrays, functions, file handling and logic building.'},
+      {id:'maths1',title:'Engineering Mathematics I',icon:'📐',desc:'Differential Calculus, Matrices, Differential Equations.'},
+      {id:'it_fund',title:'IT Fundamentals',icon:'🖥️',desc:'Introduction to computers, hardware, software, networking basics.'},
+      {id:'beee',title:'Basic Electrical Engineering',icon:'⚡',desc:'Circuits, Ohm\'s law, AC/DC, Transformers, Motors.'},
+      {id:'phy',title:'Engineering Physics',icon:'🔭',desc:'Wave Optics, Quantum Mechanics, Semiconductors, Lasers.'},
+      {id:'chem',title:'Engineering Chemistry',icon:'🧪',desc:'Polymer chemistry, Electrochemistry, Corrosion, Water treatment.'},
+    ]
+  },
+  '2': {
+    cse: [
+      {id:'ds',title:'Data Structures',icon:'🧩',desc:'Arrays, Linked Lists, Stacks, Queues, Trees, Graphs — with logic and applications.'},
+      {id:'algo',title:'Algorithms',icon:'📊',desc:'Sorting, Searching, Dynamic Programming, Greedy Algorithms, Complexity.'},
+      {id:'dbms',title:'Database Management Systems',icon:'🗄️',desc:'ER Models, SQL, Normalization, Transactions, Indexing.'},
+      {id:'maths2',title:'Engineering Mathematics II',icon:'📐',desc:'Integral Calculus, Fourier Series, Z-Transform, Statistics.'},
+      {id:'co',title:'Computer Organization',icon:'🔩',desc:'ALU, CPU design, Memory hierarchy, I/O systems, Instruction sets.'},
+      {id:'dld',title:'Digital Logic Design',icon:'🔌',desc:'Logic gates, Combinational & Sequential circuits, Flip-flops, Counters.'},
+    ],
+    csit: [
+      {id:'ds',title:'Data Structures',icon:'🧩',desc:'Arrays, Linked Lists, Stacks, Queues, Trees, Graphs — with logic and applications.'},
+      {id:'algo',title:'Algorithms',icon:'📊',desc:'Sorting, Searching, Dynamic Programming, Greedy Algorithms, Complexity.'},
+      {id:'dbms',title:'Database Management Systems',icon:'🗄️',desc:'ER Models, SQL, Normalization, Transactions, Indexing.'},
+      {id:'maths2',title:'Engineering Mathematics II',icon:'📐',desc:'Integral Calculus, Fourier Series, Z-Transform, Statistics.'},
+      {id:'wt',title:'Web Technologies',icon:'🌐',desc:'HTML, CSS, JavaScript, PHP, MySQL — full web stack basics.'},
+      {id:'dld',title:'Digital Logic Design',icon:'🔌',desc:'Logic gates, Combinational & Sequential circuits, Flip-flops, Counters.'},
+    ]
+  },
+  '3': {
+    cse: [
+      {id:'os',title:'Operating Systems',icon:'⚙️',desc:'Processes, Threads, Scheduling, Memory Management, File Systems, Deadlocks.'},
+      {id:'cn',title:'Computer Networks',icon:'🌐',desc:'OSI Model, TCP/IP, Routing, Subnetting, Network Protocols.'},
+      {id:'se',title:'Software Engineering',icon:'🛠️',desc:'SDLC, Agile, Testing, UML, Design Patterns, Project Management.'},
+      {id:'toc',title:'Theory of Computation',icon:'🔢',desc:'Automata, Regular Expressions, CFG, Turing Machines, Decidability.'},
+      {id:'cg',title:'Computer Graphics',icon:'🎨',desc:'2D/3D Transformations, Rendering, OpenGL, Rasterization, Bezier Curves.'},
+      {id:'ai',title:'Artificial Intelligence',icon:'🤖',desc:'Search, Knowledge Representation, Planning, Machine Learning intro.'},
+    ],
+    csit: [
+      {id:'os',title:'Operating Systems',icon:'⚙️',desc:'Processes, Threads, Scheduling, Memory Management, File Systems, Deadlocks.'},
+      {id:'cn',title:'Computer Networks',icon:'🌐',desc:'OSI Model, TCP/IP, Routing, Subnetting, Network Protocols.'},
+      {id:'se',title:'Software Engineering',icon:'🛠️',desc:'SDLC, Agile, Testing, UML, Design Patterns, Project Management.'},
+      {id:'toc',title:'Theory of Computation',icon:'🔢',desc:'Automata, Regular Expressions, CFG, Turing Machines, Decidability.'},
+      {id:'itm',title:'IT Management',icon:'📋',desc:'IT governance, ERP, business process management, risk management.'},
+      {id:'ai',title:'Artificial Intelligence',icon:'🤖',desc:'Search, Knowledge Representation, Planning, Machine Learning intro.'},
+    ]
+  },
+  '4': {
+    cse: [
+      {id:'ml',title:'Machine Learning',icon:'📈',desc:'Supervised/Unsupervised Learning, Neural Networks, SVM, Random Forests.'},
+      {id:'cc',title:'Cloud Computing',icon:'☁️',desc:'AWS, Azure, GCP, Virtualization, Containers, Docker, Kubernetes.'},
+      {id:'is',title:'Information Security',icon:'🔒',desc:'Cryptography, Network Security, Ethical Hacking, Firewalls, SSL/TLS.'},
+      {id:'big',title:'Big Data Analytics',icon:'📦',desc:'Hadoop, Spark, MapReduce, NoSQL, Data Pipelines, Visualization.'},
+      {id:'iot',title:'Internet of Things',icon:'📡',desc:'IoT architecture, sensors, protocols, MQTT, real-world applications.'},
+      {id:'pe',title:'Project & Elective',icon:'🎓',desc:'Final year project, mini projects, elective specialization subjects.'},
+    ],
+    csit: [
+      {id:'ml',title:'Machine Learning',icon:'📈',desc:'Supervised/Unsupervised Learning, Neural Networks, SVM, Random Forests.'},
+      {id:'cc',title:'Cloud Computing',icon:'☁️',desc:'AWS, Azure, GCP, Virtualization, Containers, Docker, Kubernetes.'},
+      {id:'is',title:'Information Security',icon:'🔒',desc:'Cryptography, Network Security, Ethical Hacking, Firewalls, SSL/TLS.'},
+      {id:'erp',title:'ERP Systems',icon:'🏢',desc:'SAP, Oracle ERP, Business modules, integration, implementation.'},
+      {id:'iot',title:'Internet of Things',icon:'📡',desc:'IoT architecture, sensors, protocols, MQTT, real-world applications.'},
+      {id:'pe',title:'Project & Elective',icon:'🎓',desc:'Final year project, mini projects, elective specialization subjects.'},
+    ]
+  }
+};
+
+const topicData = {
+  ds: {
+    title: 'Data Structures',
+    topics: [
+      { id:'intro', label:'Introduction', sub:'What & Why' },
+      { id:'arrays', label:'Arrays', sub:'Linear DS' },
+      { id:'ll', label:'Linked Lists', sub:'Dynamic DS' },
+      { id:'stacks', label:'Stacks & Queues', sub:'LIFO / FIFO' },
+      { id:'trees', label:'Trees & BST', sub:'Hierarchical' },
+      { id:'graphs', label:'Graphs', sub:'Network DS' },
+      { id:'hashing', label:'Hashing', sub:'Key-Value' },
+      { id:'qa', label:'Q&A / Quiz', sub:'Practice' },
+    ],
+    content: {
+      intro: {
+        title: 'Introduction to Data Structures',
+        subtitle: 'FOUNDATION OF PROGRAMMING',
+        info: '<h3>WHAT ARE DATA STRUCTURES?</h3><p>A Data Structure is a way of organizing and storing data in a computer so that it can be accessed and modified efficiently. It defines the relationship between data and operations that can be performed on data.</p><ul><li>Data structures are the backbone of efficient algorithms</li><li>Different problems require different data structures</li><li>Choice of data structure affects program performance significantly</li></ul>',
+        logic: '<h3>WHY DO WE NEED DATA STRUCTURES?</h3><p>Imagine you have 1 million student records. Storing them in a random manner means searching takes O(n) time. But using a sorted array with binary search reduces it to O(log n). That\'s the power of the right data structure.</p><p><strong>Real Application:</strong> Google\'s search uses hash maps and trees. Facebook\'s friend suggestions use graphs. Undo/redo in editors use stacks.</p>',
+        qa: [
+          {q:'What is the difference between a data structure and a data type?', a:'A data type defines the type of data (int, string etc.), while a data structure defines how data is organized and the operations on it. Data structures use data types as building blocks.'},
+          {q:'What are the two types of data structures?', a:'1. Linear Data Structures (Array, Stack, Queue, Linked List) — data is arranged sequentially. 2. Non-Linear Data Structures (Trees, Graphs) — data is arranged hierarchically or in a network.'},
+          {q:'What is time complexity and why is it important?', a:'Time complexity measures how the runtime of an algorithm grows with input size. It helps us compare algorithms and choose the most efficient one for a given problem. Expressed using Big O notation like O(1), O(n), O(log n), O(n²).'},
+        ]
+      },
+      arrays: {
+        title: 'Arrays',
+        subtitle: 'CONTIGUOUS MEMORY STORAGE',
+        info: '<h3>DEFINITION</h3><p>An array is a collection of elements of the same data type stored in contiguous memory locations. Each element is identified by its index (0-based in most languages).</p><ul><li>Fixed size (static arrays) or dynamic (ArrayList/vector)</li><li>Random access in O(1) time using index</li><li>Insertion/Deletion at middle is O(n)</li><li>Memory allocated at compile time (static) or runtime (dynamic)</li></ul><h3>TYPES</h3><ul><li>1D Array: int arr[5] = {1,2,3,4,5}</li><li>2D Array (Matrix): int mat[3][3]</li><li>Multi-dimensional arrays</li><li>Jagged arrays</li></ul>',
+        logic: '<h3>LOGIC BUILDING WITH ARRAYS</h3><p>To search an element linearly: Start at index 0, check each element, return index if found, -1 if not. This is O(n).</p><p>Binary Search (sorted array): Check middle element. If target is smaller, search left half. If larger, search right half. Repeat. This is O(log n).</p><p><strong>Common Patterns:</strong> Two-pointer technique, sliding window, prefix sum — all are array-based optimization techniques.</p><p><strong>Application:</strong> Image pixels stored in 2D arrays, spreadsheet cells, leaderboards, inventory lists.</p>',
+        qa: [
+          {q:'What is the time complexity of accessing an element in an array?', a:'O(1) — constant time. Since arrays are stored in contiguous memory, the address of any element can be computed directly as: base_address + (index × element_size). No traversal needed.'},
+          {q:'Why is insertion in the middle of an array O(n)?', a:'Because all elements after the insertion point must be shifted one position to the right to make room for the new element. In the worst case (inserting at position 0), all n elements are shifted, making it O(n).'},
+          {q:'Difference between Array and ArrayList in Java?', a:'Array has fixed size, can store primitives, faster access. ArrayList is dynamic (resizes automatically), stores only objects, has built-in methods like add(), remove(), size(). ArrayList uses an array internally and doubles capacity when full.'},
+          {q:'What is a sparse matrix and how to store it efficiently?', a:'A sparse matrix has most elements as zero. Storing it as a 2D array wastes memory. Efficient representations: Triplet (row, col, value) list, CSR (Compressed Sparse Row) format, or linked list representation — only storing non-zero elements.'},
+        ]
+      },
+      ll: {
+        title: 'Linked Lists',
+        subtitle: 'DYNAMIC NODE-BASED STRUCTURE',
+        info: '<h3>DEFINITION</h3><p>A Linked List is a linear data structure where elements (nodes) are stored at non-contiguous memory locations, linked using pointers. Each node contains: Data + Pointer to next node.</p><ul><li>Singly Linked List: Each node points to next only</li><li>Doubly Linked List: Each node points to next and previous</li><li>Circular Linked List: Last node points back to head</li></ul><h3>OPERATIONS & COMPLEXITY</h3><ul><li>Insertion at head: O(1)</li><li>Insertion at tail: O(n) or O(1) with tail pointer</li><li>Deletion: O(1) if node reference known, O(n) to find</li><li>Search: O(n) — must traverse</li><li>Access by index: O(n) — no random access</li></ul>',
+        logic: '<h3>HOW LINKED LISTS WORK</h3><p>Think of a train — each coach (node) is connected to the next one. To reach coach 5, you start from coach 1 and move forward. You can add/remove coaches easily without rearranging others.</p><p><strong>Insertion at head logic:</strong> Create new node → new_node.next = head → head = new_node. Just 3 steps, always O(1)!</p><p><strong>Reversing a linked list:</strong> Use 3 pointers (prev, current, next). Iterate: save next, point current.next to prev, move prev and current forward. Very common interview question!</p><p><strong>Applications:</strong> Browser history (doubly linked list), Music player playlist, Undo operations, Dynamic memory allocation.</p>',
+        qa: [
+          {q:'When would you prefer a Linked List over an Array?', a:'Prefer Linked List when: frequent insertions/deletions at beginning or middle are needed, size is unknown at compile time, memory is fragmented. Prefer Array when: random access is needed, cache performance matters, memory overhead should be minimal (no pointers needed).'},
+          {q:'How to detect a cycle in a linked list?', a:'Floyd\'s Cycle Detection (Tortoise and Hare Algorithm): Use two pointers — slow (moves 1 step) and fast (moves 2 steps). If they meet, cycle exists. If fast reaches null, no cycle. Time: O(n), Space: O(1).'},
+          {q:'How to find the middle of a linked list in one pass?', a:'Use two pointers: slow and fast. Move slow by 1 and fast by 2. When fast reaches the end, slow is at the middle. For even-length lists, slow will be at the first middle node.'},
+        ]
+      },
+      stacks: {
+        title: 'Stacks & Queues',
+        subtitle: 'LIFO AND FIFO DATA STRUCTURES',
+        info: '<h3>STACK — LIFO (Last In First Out)</h3><p>Like a stack of plates — you add and remove from the top only.</p><ul><li>push(x): Add element to top — O(1)</li><li>pop(): Remove from top — O(1)</li><li>peek()/top(): View top element — O(1)</li><li>isEmpty(): Check if empty — O(1)</li></ul><h3>QUEUE — FIFO (First In First Out)</h3><p>Like a line at a ticket counter — first person in line gets served first.</p><ul><li>enqueue(x): Add to rear — O(1)</li><li>dequeue(): Remove from front — O(1)</li><li>Types: Simple, Circular, Priority Queue, Deque</li></ul>',
+        logic: '<h3>REAL APPLICATIONS</h3><p><strong>Stack Applications:</strong> Function call stack (recursion), Expression evaluation (infix to postfix), Browser back button, Undo/redo, Balanced parentheses checker.</p><p><strong>Queue Applications:</strong> CPU scheduling (Round Robin), Print spooler, BFS traversal, Handling requests in web servers.</p><p><strong>Balanced Parentheses Logic:</strong> Push opening brackets onto stack. When closing bracket found, pop from stack and check if it matches. If stack empty at end → balanced. O(n) time, O(n) space.</p>',
+        qa: [
+          {q:'How to implement a stack using queues?', a:'Use two queues (q1, q2). For push: enqueue to q1. For pop: move all elements from q1 to q2 except last, return last element, swap q1 and q2. Alternatively, push can be made expensive — enqueue new element to q2, move all of q1 to q2, swap.'},
+          {q:'What is a Priority Queue?', a:'A priority queue is an abstract data type where each element has a priority. The element with the highest (or lowest) priority is served first, regardless of insertion order. Implemented using heaps. Used in Dijkstra\'s algorithm, Huffman coding, OS scheduling.'},
+          {q:'Explain the call stack with recursion.', a:'Every function call is pushed onto the call stack. When a function returns, it\'s popped. Recursive functions keep pushing calls until base case, then pop back. Stack overflow happens when recursion is too deep (stack memory exhausted).'},
+        ]
+      },
+      trees: {
+        title: 'Trees & Binary Search Trees',
+        subtitle: 'HIERARCHICAL DATA STRUCTURES',
+        info: '<h3>TREE BASICS</h3><p>A tree is a non-linear hierarchical data structure. Key terms: Root (top node), Leaf (no children), Height (levels), Degree (number of children).</p><h3>BINARY SEARCH TREE (BST)</h3><ul><li>Each node has at most 2 children (left, right)</li><li>Left subtree values < root value</li><li>Right subtree values > root value</li><li>Search, Insert, Delete: O(log n) average, O(n) worst</li></ul><h3>TREE TRAVERSALS</h3><ul><li>Inorder (L→Root→R): gives sorted order in BST</li><li>Preorder (Root→L→R): for copying tree</li><li>Postorder (L→R→Root): for deleting tree</li><li>Level Order (BFS): breadth-first</li></ul>',
+        logic: '<h3>BST SEARCH LOGIC</h3><p>Start at root. If target = root, found! If target < root, go left. If target > root, go right. Repeat until found or null. This eliminates half the tree at each step → O(log n)!</p><p><strong>Balanced vs Unbalanced:</strong> A skewed BST (e.g., all right children) degrades to O(n). Balanced trees like AVL and Red-Black trees maintain O(log n) by self-balancing.</p><p><strong>Applications:</strong> File systems (directory tree), XML/HTML DOM parsing, Expression trees, Database indexing (B-Trees), Compiler symbol tables.</p>',
+        qa: [
+          {q:'What is the difference between a full, complete, and perfect binary tree?', a:'Full Binary Tree: every node has 0 or 2 children. Complete Binary Tree: all levels filled except possibly last, last level filled left to right (used in heaps). Perfect Binary Tree: all internal nodes have 2 children and all leaves at same level — has exactly 2^h - 1 nodes.'},
+          {q:'What is an AVL tree and why is it needed?', a:'An AVL tree is a self-balancing BST where the height difference (balance factor) between left and right subtrees of every node is at most 1. Without it, BST can become skewed (O(n) operations). AVL maintains O(log n) always via rotations (Left, Right, Left-Right, Right-Left).'},
+          {q:'What is a heap and how is it different from a BST?', a:'A heap is a complete binary tree where parent is always greater (max-heap) or smaller (min-heap) than children. BST maintains sorted order left-to-right; heap maintains parent-child order. Heap supports O(1) access to max/min and is used for priority queues and heap sort.'},
+        ]
+      },
+      graphs: {
+        title: 'Graphs',
+        subtitle: 'NETWORK DATA STRUCTURE',
+        info: '<h3>WHAT IS A GRAPH?</h3><p>A graph G = (V, E) where V = vertices (nodes) and E = edges (connections). Models networks, relationships, maps.</p><ul><li>Directed Graph (Digraph): edges have direction</li><li>Undirected Graph: edges are bidirectional</li><li>Weighted Graph: edges have weights/costs</li><li>Cyclic vs Acyclic (DAG)</li></ul><h3>REPRESENTATION</h3><ul><li>Adjacency Matrix: O(V²) space, O(1) edge check</li><li>Adjacency List: O(V+E) space, efficient for sparse graphs</li></ul><h3>TRAVERSAL</h3><ul><li>BFS (Breadth-First Search): level by level, uses Queue</li><li>DFS (Depth-First Search): goes deep first, uses Stack/Recursion</li></ul>',
+        logic: '<h3>BFS LOGIC</h3><p>Start from source. Mark as visited. Add to queue. While queue is not empty: dequeue a vertex, visit all its unvisited neighbors, mark them visited, add to queue. Finds shortest path in unweighted graphs.</p><p><strong>DFS Logic:</strong> Start from source. Mark visited. Recursively visit all unvisited neighbors. Used for cycle detection, topological sort, connected components.</p><p><strong>Dijkstra\'s Algorithm:</strong> Shortest path in weighted graph. Use priority queue. Greedily pick the vertex with minimum distance. Update neighbors\' distances. O((V+E) log V).</p><p><strong>Applications:</strong> Google Maps (shortest path), Social networks (friend suggestions), Web crawlers, Airline routes, Circuit design.</p>',
+        qa: [
+          {q:'What is the difference between BFS and DFS?', a:'BFS explores level by level (uses Queue, O(V+E) time), finds shortest path in unweighted graphs, better for finding nearby nodes. DFS goes as deep as possible first (uses Stack/Recursion, O(V+E) time), better for detecting cycles, topological sorting, finding connected components.'},
+          {q:'What is topological sorting?', a:'A linear ordering of vertices of a DAG such that for every directed edge u→v, vertex u comes before v in the ordering. Only possible for DAGs (Directed Acyclic Graphs). Used in task scheduling, build systems (like Make), course prerequisites. Implemented using DFS or Kahn\'s algorithm (BFS with in-degree).'},
+          {q:'Explain Kruskal\'s algorithm for Minimum Spanning Tree.', a:'Sort all edges by weight. Use Union-Find (Disjoint Set) to check for cycles. Greedily pick the smallest edge that doesn\'t form a cycle. Repeat until V-1 edges are selected. Time: O(E log E). A Minimum Spanning Tree connects all vertices with minimum total edge weight.'},
+        ]
+      },
+      hashing: {
+        title: 'Hashing',
+        subtitle: 'KEY-VALUE MAPPING',
+        info: '<h3>WHAT IS HASHING?</h3><p>Hashing is a technique that maps data (keys) to fixed-size values (hash codes) using a hash function, enabling O(1) average time for search, insert, and delete.</p><ul><li>Hash Function: converts key to index</li><li>Hash Table: array that stores key-value pairs</li><li>Collision: when two keys hash to same index</li></ul><h3>COLLISION RESOLUTION</h3><ul><li>Chaining: each slot holds a linked list of entries</li><li>Open Addressing: find next empty slot (Linear Probing, Quadratic Probing, Double Hashing)</li></ul><h3>LOAD FACTOR</h3><p>Ratio of items to table size. When load factor exceeds threshold (usually 0.75), rehash — resize table and reinsert all elements.</p>',
+        logic: '<h3>HASH FUNCTION LOGIC</h3><p>A simple hash: h(key) = key % table_size. For strings: sum ASCII values × polynomial, then mod table_size. Good hash functions distribute keys uniformly to minimize collisions.</p><p><strong>Why O(1)?</strong> Given a key, compute hash(key) → directly access that index. No traversal needed!</p><p><strong>Applications:</strong> Python dictionaries, Java HashMaps, Caching (Redis), Database indexing, Password storage (bcrypt), Blockchain (SHA-256), Compiler symbol tables, Plagiarism detection (Rabin-Karp).</p>',
+        qa: [
+          {q:'What is the difference between HashMap and Hashtable in Java?', a:'HashMap: not synchronized (not thread-safe), allows one null key and multiple null values, faster, part of Collections Framework (Java 1.2+). Hashtable: synchronized (thread-safe), no null keys or values, slower due to synchronization, legacy class. Use ConcurrentHashMap for thread-safe modern alternative.'},
+          {q:'What happens during rehashing?', a:'When load factor exceeds threshold, a new larger array (usually 2x size) is created, and all existing key-value pairs are re-inserted using the new hash function (since table size changed). This is O(n) but happens rarely — amortized cost is O(1) per insertion.'},
+          {q:'Explain consistent hashing.', a:'Used in distributed systems (like CDNs, distributed databases). Maps both servers and keys onto a circular ring. A key is assigned to the nearest server clockwise. When a server is added/removed, only nearby keys need remapping — not all keys. Minimizes cache misses during scaling.'},
+        ]
+      },
+      qa: {
+        title: 'Q&A Practice — Data Structures',
+        subtitle: 'TEST YOUR KNOWLEDGE',
+        quiz: [
+          {q:'Which data structure uses LIFO principle?', opts:['Queue','Stack','Tree','Graph'], ans:1},
+          {q:'What is the time complexity of binary search?', opts:['O(n)','O(n²)','O(log n)','O(1)'], ans:2},
+          {q:'Which traversal of a BST gives sorted output?', opts:['Preorder','Postorder','Inorder','Level Order'], ans:2},
+          {q:'What data structure is used for BFS?', opts:['Stack','Queue','Heap','Array'], ans:1},
+          {q:'What is the worst-case space complexity of a hash table?', opts:['O(1)','O(log n)','O(n)','O(n²)'], ans:2},
+        ]
+      }
+    }
+  },
+  os: {
+    title: 'Operating Systems',
+    topics: [
+      {id:'intro',label:'OS Introduction',sub:'What & Types'},
+      {id:'process',label:'Processes & Threads',sub:'Execution units'},
+      {id:'sched',label:'CPU Scheduling',sub:'Algorithms'},
+      {id:'mem',label:'Memory Management',sub:'Paging & Segmentation'},
+      {id:'fs',label:'File Systems',sub:'Storage'},
+      {id:'dead',label:'Deadlocks',sub:'Detection & Prevention'},
+      {id:'qa',label:'Q&A / Quiz',sub:'Practice'},
+    ],
+    content: {
+      intro: {
+        title: 'Introduction to Operating Systems',
+        subtitle: 'THE BACKBONE OF COMPUTING',
+        info: '<h3>WHAT IS AN OS?</h3><p>An Operating System is system software that manages hardware and software resources, providing services to user programs. It acts as an intermediary between users and hardware.</p><ul><li>Resource Manager: CPU, Memory, I/O devices</li><li>Process Manager: creates, schedules, terminates processes</li><li>Memory Manager: allocates/deallocates memory</li><li>File System Manager: organizes stored data</li><li>Security Manager: access control, authentication</li></ul><h3>TYPES OF OS</h3><ul><li>Batch OS: jobs processed in batches, no user interaction</li><li>Time-Sharing OS: multiple users simultaneously (Unix)</li><li>Real-Time OS: strict timing constraints (RTOS)</li><li>Distributed OS: across multiple machines</li><li>Embedded OS: in devices (Android, iOS)</li></ul>',
+        logic: '<h3>HOW OS BOOTS</h3><p>Power ON → BIOS/UEFI runs POST → loads bootloader from disk → bootloader loads OS kernel into RAM → kernel initializes hardware, starts init/systemd → user login. This entire process is what happens every time you start your computer!</p><p><strong>Kernel vs User Space:</strong> Kernel runs with full hardware access. User programs run in restricted user space. System calls are the bridge — like a controlled gateway between user and kernel.</p>',
+        qa: [
+          {q:'What is the difference between a process and a thread?', a:'A process is an independent program in execution with its own memory space (code, data, stack, heap). A thread is the smallest unit of execution within a process. Multiple threads share the same process memory. Threads are lighter — context switching between threads is faster than between processes.'},
+          {q:'What is a system call?', a:'A system call is a mechanism for a user-space program to request a service from the kernel (OS). Examples: read(), write(), fork(), exec(), open(). When a system call is made, CPU switches from user mode to kernel mode (trap), OS handles the request, returns result, switches back to user mode.'},
+        ]
+      },
+      sched: {
+        title: 'CPU Scheduling',
+        subtitle: 'ALGORITHMS & CRITERIA',
+        info: '<h3>SCHEDULING CRITERIA</h3><ul><li>CPU Utilization: keep CPU as busy as possible</li><li>Throughput: number of processes completed per unit time</li><li>Turnaround Time: time from submission to completion</li><li>Waiting Time: total time spent in ready queue</li><li>Response Time: time from submission to first response</li></ul><h3>SCHEDULING ALGORITHMS</h3><ul><li>FCFS (First Come First Served): simple, non-preemptive, convoy effect</li><li>SJF (Shortest Job First): optimal average wait time, hard to know burst time</li><li>Round Robin: preemptive, time quantum, best for time-sharing</li><li>Priority Scheduling: each process has priority, starvation possible</li><li>Multilevel Queue: separate queues for different process types</li></ul>',
+        logic: '<h3>ROUND ROBIN EXAMPLE</h3><p>Time quantum = 4ms. Processes: P1(burst=8), P2(burst=4), P3(burst=9). P1 runs 0-4, P2 runs 4-8 (done!), P3 runs 8-12, P1 runs 12-16 (done!), P3 runs 16-21 (done!). Average waiting time = ((8-4)+0+(12-9))/3 = (4+0+3)/3 = 2.33ms. Much better than FCFS!</p><p><strong>Why not always use SJF?</strong> We don\'t know the CPU burst time in advance for real processes. We can only estimate based on past behavior (exponential averaging).</p>',
+        qa: [
+          {q:'What is the difference between preemptive and non-preemptive scheduling?', a:'Non-preemptive: once a process is allocated CPU, it runs until it completes or blocks (FCFS, SJF non-preemptive). Preemptive: OS can interrupt a running process and switch to another (Round Robin, SRTF). Preemptive is better for responsiveness but has higher context-switch overhead.'},
+          {q:'What is the aging solution to starvation?', a:'Starvation occurs when low-priority processes never get CPU. Aging is a technique where the priority of a waiting process gradually increases over time. Eventually even the lowest-priority process gets high enough priority to run. This prevents indefinite waiting.'},
+        ]
+      },
+      dead: {
+        title: 'Deadlocks',
+        subtitle: 'DETECTION, PREVENTION & RECOVERY',
+        info: '<h3>WHAT IS DEADLOCK?</h3><p>A deadlock is a situation where a set of processes are permanently blocked, each waiting for a resource held by another process in the set. Like a traffic gridlock — no one can move!</p><h3>4 CONDITIONS (COFFMAN CONDITIONS)</h3><ul><li>Mutual Exclusion: resource used by only one process</li><li>Hold & Wait: process holds resource and waits for more</li><li>No Preemption: resources cannot be forcibly taken</li><li>Circular Wait: P1 waits for P2, P2 waits for P3, P3 waits for P1</li></ul><h3>HANDLING STRATEGIES</h3><ul><li>Prevention: eliminate one of the 4 conditions</li><li>Avoidance: Banker\'s Algorithm — safe state check</li><li>Detection & Recovery: allow deadlock, detect using RAG, kill processes</li><li>Ignorance: Ostrich Algorithm (Windows/Linux use this!)</li></ul>',
+        logic: '<h3>BANKER\'S ALGORITHM LOGIC</h3><p>Like a bank that never lends money if it could leave itself unable to meet future requests. OS checks if granting a resource request leads to a "safe state" (a sequence exists to complete all processes). If safe, grant. If not, make process wait.</p><p><strong>Resource Allocation Graph (RAG):</strong> Vertices = processes + resources. Assignment edge: resource→process (currently held). Request edge: process→resource (wants). A cycle in RAG (with single-instance resources) = deadlock!</p>',
+        qa: [
+          {q:'How does the Banker\'s Algorithm work?', a:'Banker\'s Algorithm (Dijkstra): For each resource request, tentatively allocate it. Check if a "safe sequence" exists — an ordering of processes where each can be completed using available + released resources. If safe sequence exists → grant request. Otherwise → deny (wait). Prevents deadlock by ensuring system never enters unsafe state.'},
+          {q:'What is the difference between deadlock and starvation?', a:'Deadlock: a set of processes are ALL permanently blocked — none can proceed ever (circular dependency). Starvation: a process is delayed indefinitely because others keep getting resources first — but it COULD eventually run. Deadlock is always bad; starvation can be fixed with aging. Deadlock involves circular wait; starvation does not.'},
+        ]
+      },
+      qa: {
+        title: 'Q&A Practice — Operating Systems',
+        subtitle: 'TEST YOUR KNOWLEDGE',
+        quiz: [
+          {q:'Which scheduling algorithm has the minimum average waiting time?', opts:['FCFS','SJF','Round Robin','Priority'], ans:1},
+          {q:'How many conditions are necessary for deadlock?', opts:['2','3','4','5'], ans:2},
+          {q:'Which OS technique loads only required pages into memory?', opts:['Swapping','Demand Paging','Segmentation','Compaction'], ans:1},
+          {q:'What is the purpose of the Translation Lookaside Buffer (TLB)?', opts:['Cache page table entries','Store processes','Handle interrupts','Schedule CPU'], ans:0},
+        ]
+      },
+      process:{title:'Processes & Threads',subtitle:'EXECUTION UNITS',info:'<h3>PROCESS</h3><p>A process is a program in execution. It has its own memory space: code segment, data segment, heap, and stack. Process states: New → Ready → Running → Waiting → Terminated.</p><h3>THREAD</h3><p>A thread is the smallest unit of CPU execution within a process. Threads share the process\'s memory (code, data, heap) but each has its own stack and registers. Benefits: faster creation, less context-switch overhead, easy data sharing.</p><ul><li>User-Level Threads: managed by user library, OS unaware</li><li>Kernel-Level Threads: managed by OS, better utilization</li></ul>',logic:'<h3>CONTEXT SWITCHING</h3><p>When OS switches CPU from one process/thread to another: save current process state (PCB — Process Control Block), load new process state. PCB stores: PID, program counter, CPU registers, memory maps, open files, scheduling info.</p><p><strong>Why threads are "lightweight":</strong> Thread switch only saves/restores registers and stack pointer. Process switch saves entire memory mapping, is much more expensive.</p>',qa:[{q:'What is a PCB?',a:'Process Control Block — a data structure the OS maintains for each process. Contains: PID, process state, program counter, CPU registers, memory management info, I/O status, accounting info. Essentially the "identity card" of a process.'},{q:'What is context switching?',a:'The process of saving the state of a running process and loading the state of another process so the CPU can execute it. The saved state is stored in the PCB. Context switching is pure overhead — CPU does no useful work during it.'}]},
+      mem:{title:'Memory Management',subtitle:'VIRTUAL MEMORY & PAGING',info:'<h3>GOALS</h3><p>Efficiently allocate memory to processes, provide protection between processes, support virtual memory (more RAM than physically available).</p><h3>PAGING</h3><p>Physical memory divided into frames, logical memory into pages (same size). OS maintains page table to map logical to physical. No external fragmentation. Internal fragmentation possible (last page may not be full).</p><h3>VIRTUAL MEMORY</h3><p>Allows processes to use more memory than physically available. Pages not currently needed are swapped to disk. Page fault occurs when accessed page is not in RAM — OS loads it from disk.</p>',logic:'<h3>PAGE REPLACEMENT ALGORITHMS</h3><p>When RAM is full and new page needed: evict a page. Algorithms: FIFO (evict oldest), Optimal (evict page used farthest in future — theoretical), LRU (evict least recently used — best practical). LRU approximated using hardware bits or clock algorithm.</p>',qa:[{q:'What is thrashing?',a:'When a process spends more time swapping pages in/out than executing. Happens when multiprogramming degree is too high — too many processes competing for frames. Solution: Working Set Model — allocate enough frames for each process\'s working set (set of pages recently used).'}]},
+      fs:{title:'File Systems',subtitle:'DATA ORGANIZATION ON DISK',info:'<h3>FILE SYSTEM BASICS</h3><p>Organizes data on storage devices. Key concepts: files, directories, paths, permissions.</p><h3>DISK ALLOCATION METHODS</h3><ul><li>Contiguous: files stored in consecutive blocks, fast read, fragmentation</li><li>Linked: blocks linked by pointers, no fragmentation, slow random access</li><li>Indexed: index block stores all pointers, combines advantages</li></ul><h3>DIRECTORY STRUCTURES</h3><ul><li>Single-level, Two-level, Tree-structured (most common), Acyclic-graph (Unix)</li></ul>',logic:'<h3>UNIX INODE SYSTEM</h3><p>Each file has an inode (index node) containing metadata (size, permissions, timestamps, owner) and pointers to data blocks. Direct blocks (small files), single/double/triple indirect blocks (large files). inode number is the file\'s "true identity" — the name is just an alias!</p>',qa:[{q:'What is the difference between hard link and soft link?',a:'Hard link: another directory entry pointing to the same inode. Deleting original file doesn\'t delete data — inode remains. Soft (symbolic) link: a shortcut pointing to the file\'s path/name. If original deleted, link breaks. Hard links can\'t span filesystems; soft links can.'}]}
+    }
+  },
+  dbms:{
+    title:'Database Management Systems',
+    topics:[
+      {id:'intro',label:'Introduction',sub:'DBMS Concepts'},
+      {id:'er',label:'ER Model',sub:'Entity-Relationship'},
+      {id:'sql',label:'SQL',sub:'Query Language'},
+      {id:'norm',label:'Normalization',sub:'1NF to BCNF'},
+      {id:'trans',label:'Transactions',sub:'ACID & Concurrency'},
+      {id:'qa',label:'Q&A / Quiz',sub:'Practice'},
+    ],
+    content:{
+      intro:{title:'Introduction to DBMS',subtitle:'ORGANIZED DATA MANAGEMENT',info:'<h3>WHAT IS DBMS?</h3><p>A Database Management System is software that manages databases — organized collections of related data. It provides an interface between users/applications and the physical data storage.</p><ul><li>Advantages over file systems: data redundancy control, data consistency, concurrent access, security, backup/recovery</li><li>Types: Relational (MySQL, PostgreSQL), NoSQL (MongoDB), NewSQL, Graph DB</li><li>3-Schema Architecture: External (user views), Conceptual (logical), Internal (physical storage)</li></ul>',logic:'<h3>WHY DBMS?</h3><p>Imagine a university storing student data in separate files for each department. Same student\'s data would be duplicated — updating name in one place doesn\'t update others (inconsistency). DBMS solves this with a central repository, data integrity rules, and controlled access.</p>',qa:[{q:'What is data independence?',a:'The ability to modify the schema at one level without affecting the schema at the next higher level. Logical data independence: change conceptual schema without affecting external views. Physical data independence: change internal schema (storage) without affecting conceptual schema. Crucial for maintaining applications when DB structure changes.'}]},
+      sql:{title:'SQL — Structured Query Language',subtitle:'DATA MANIPULATION & DEFINITION',info:'<h3>SQL CATEGORIES</h3><ul><li>DDL (Data Definition Language): CREATE, ALTER, DROP, TRUNCATE</li><li>DML (Data Manipulation Language): SELECT, INSERT, UPDATE, DELETE</li><li>DCL (Data Control Language): GRANT, REVOKE</li><li>TCL (Transaction Control Language): COMMIT, ROLLBACK, SAVEPOINT</li></ul><h3>KEY CLAUSES</h3><ul><li>WHERE: filter rows</li><li>GROUP BY + HAVING: aggregate and filter groups</li><li>ORDER BY: sort results</li><li>JOIN: combine tables (INNER, LEFT, RIGHT, FULL OUTER, CROSS)</li><li>Subqueries: query inside query</li></ul>',logic:'<h3>JOIN LOGIC</h3><p>INNER JOIN returns rows where condition matches in BOTH tables. LEFT JOIN returns all rows from left table + matching from right (null if no match). Think of sets: INNER = intersection, LEFT = all of left circle.</p><p><strong>Example:</strong> SELECT s.name, c.course FROM students s INNER JOIN courses c ON s.id = c.student_id WHERE c.year = 2024;</p>',qa:[{q:'What is the difference between WHERE and HAVING?',a:'WHERE filters rows BEFORE grouping (works on individual rows, cannot use aggregate functions). HAVING filters groups AFTER GROUP BY (works on aggregated results, can use COUNT, SUM, AVG etc.). Example: SELECT dept, COUNT(*) FROM emp WHERE salary > 30000 GROUP BY dept HAVING COUNT(*) > 5;'},{q:'What are indexes and when to use them?',a:'An index is a data structure (usually B-Tree) that improves SELECT speed at the cost of INSERT/UPDATE/DELETE speed and extra storage. Create index on: frequently searched columns (WHERE), JOIN columns, ORDER BY columns. Avoid over-indexing — every index slows down writes.'}]},
+      norm:{title:'Normalization',subtitle:'ELIMINATING REDUNDANCY',info:'<h3>WHY NORMALIZE?</h3><p>To eliminate data redundancy (duplication) and anomalies: insertion anomaly (can\'t add data without unrelated data), deletion anomaly (deleting data loses other info), update anomaly (same fact stored multiple times).</p><h3>NORMAL FORMS</h3><ul><li>1NF: atomic values, no repeating groups, primary key defined</li><li>2NF: 1NF + no partial dependency (non-key attributes depend on entire primary key)</li><li>3NF: 2NF + no transitive dependency (non-key attributes depend only on primary key)</li><li>BCNF: stricter 3NF — every determinant must be a candidate key</li></ul>',logic:'<h3>EXAMPLE STEP BY STEP</h3><p>Table: {StudentID, CourseID, StudentName, CourseName, Grade}. PK = {StudentID, CourseID}. StudentName depends only on StudentID (partial dep) → violates 2NF. Split: Students(StudentID, StudentName) + Courses(CourseID, CourseName) + Enrollment(StudentID, CourseID, Grade). Now in 3NF!</p>',qa:[{q:'What is denormalization and when is it used?',a:'Denormalization is intentionally adding redundancy back to a normalized database to improve read performance. Used when: JOINs are too slow for read-heavy applications, data warehousing/analytics (OLAP), pre-computed aggregates needed. Trade-off: faster reads, slower writes, risk of inconsistency.'}]},
+      trans:{title:'Transactions & Concurrency',subtitle:'ACID PROPERTIES',info:'<h3>TRANSACTION</h3><p>A transaction is a sequence of operations performed as a single logical unit of work. Either ALL operations complete (commit) or NONE do (rollback).</p><h3>ACID PROPERTIES</h3><ul><li>Atomicity: all or nothing — no partial execution</li><li>Consistency: DB goes from one valid state to another</li><li>Isolation: concurrent transactions don\'t interfere</li><li>Durability: committed transactions survive failures</li></ul><h3>CONCURRENCY ISSUES</h3><ul><li>Dirty Read: reading uncommitted data</li><li>Non-repeatable Read: same query gives different results</li><li>Phantom Read: new rows appear between reads</li></ul>',logic:'<h3>HOW ATOMICITY WORKS</h3><p>DBMS maintains a transaction log (WAL — Write Ahead Log). Before any change, log the old value. If crash occurs, redo or undo operations from log to restore consistency. This is why DBMS can recover from crashes!</p>',qa:[{q:'Explain isolation levels in SQL.',a:'READ UNCOMMITTED: can read dirty data (no locks). READ COMMITTED (default in most DBs): only reads committed data. REPEATABLE READ: prevents non-repeatable reads — row locked until transaction ends. SERIALIZABLE: strictest — completely isolated, prevents phantom reads. Higher isolation = more consistency but less concurrency/throughput.'}]},
+      er:{title:'Entity-Relationship Model',subtitle:'CONCEPTUAL DESIGN',info:'<h3>ER MODEL COMPONENTS</h3><ul><li>Entity: real-world object (Student, Course)</li><li>Attribute: property of entity (Name, Age)</li><li>Relationship: association between entities (Student ENROLLS Course)</li><li>Cardinality: 1:1, 1:N, M:N</li></ul><h3>ATTRIBUTE TYPES</h3><ul><li>Simple: atomic (Name)</li><li>Composite: can be subdivided (Address → Street, City)</li><li>Derived: computed from others (Age from DOB)</li><li>Multi-valued: multiple values (Phone numbers)</li></ul>',logic:'<h3>ER TO RELATIONAL MAPPING</h3><p>Entity → Table. Attributes → Columns. Primary Key → Unique identifier. 1:N relationship → FK in N-side table. M:N relationship → new junction table with both PKs. Weak entity → include owner\'s PK as FK.</p>',qa:[{q:'What is a weak entity?',a:'A weak entity is an entity that cannot be uniquely identified by its own attributes alone — it depends on a strong (owner) entity. For example, Dependent depends on Employee. The weak entity\'s primary key includes the owner\'s PK (partial key + owner PK = composite PK). Shown with double rectangle in ER diagram.'}]},
+      qa:{title:'Q&A Practice — DBMS',subtitle:'TEST YOUR KNOWLEDGE',quiz:[{q:'Which SQL command removes all rows but keeps table structure?',opts:['DROP','DELETE','TRUNCATE','ALTER'],ans:2},{q:'Which normal form removes transitive dependencies?',opts:['1NF','2NF','3NF','BCNF'],ans:2},{q:'What does ACID stand for?',opts:['Atomic,Consistent,Isolated,Durable','All,Complete,Integrated,Data','Atomic,Complete,Indexed,Durable','None of these'],ans:0},{q:'Which JOIN returns all rows from both tables?',opts:['INNER JOIN','LEFT JOIN','RIGHT JOIN','FULL OUTER JOIN'],ans:3}]}
+    }
+  }
+};
+
+const aiTopicData = {
+  foundations:{
+    title:'AI Foundations',
+    topics:[
+      {id:'intro',label:'History of AI',sub:'Origins'},
+      {id:'agents',label:'Intelligent Agents',sub:'Types & Structure'},
+      {id:'search',label:'Search Algorithms',sub:'BFS, DFS, A*'},
+      {id:'kr',label:'Knowledge Representation',sub:'Logic & Ontology'},
+      {id:'qa',label:'Predicted Q&A',sub:'Exam Prep'},
+    ],
+    content:{
+      intro:{title:'History & Introduction to AI',subtitle:'FROM TURING TO TRANSFORMERS',info:'<h3>TIMELINE OF AI</h3><ul><li>1943: McCulloch & Pitts — first artificial neuron model</li><li>1950: Alan Turing — "Computing Machinery and Intelligence", Turing Test</li><li>1956: Dartmouth Conference — term "Artificial Intelligence" coined by John McCarthy</li><li>1957: First neural network (Perceptron) by Rosenblatt</li><li>1966-1973: First AI Winter — funding cuts, unmet promises</li><li>1980s: Expert Systems boom</li><li>1987-1993: Second AI Winter</li><li>1997: Deep Blue beats Kasparov at chess</li><li>2012: AlexNet wins ImageNet → Deep Learning revolution</li><li>2016: AlphaGo beats world champion</li><li>2017: Transformer architecture (Attention is All You Need)</li><li>2022: ChatGPT — AI enters mainstream</li></ul>',logic:'<h3>TURING TEST EXPLAINED</h3><p>Turing proposed: if a human evaluator can\'t distinguish between responses from a machine and a human in a text conversation, the machine can be considered "intelligent." It\'s not about thinking — it\'s about behaving intelligently. Modern LLMs can pass simple Turing tests, but philosophers argue it doesn\'t prove true intelligence.</p>',qa:[{q:'What is the difference between Artificial Intelligence, Machine Learning, and Deep Learning?',a:'AI is the broadest field — making machines intelligent. ML is a subset of AI — machines learn from data without being explicitly programmed. Deep Learning is a subset of ML — uses multi-layer neural networks. Think of concentric circles: Deep Learning ⊂ Machine Learning ⊂ Artificial Intelligence.'},{q:'What are the different types of AI?',a:'By capability: Narrow AI (ANI) — does one specific task (current AI). General AI (AGI) — can do any intellectual task a human can (not yet achieved). Super AI (ASI) — surpasses human intelligence (theoretical). By approach: Reactive (no memory), Limited Memory (current ML models), Theory of Mind (understands emotions — in research), Self-Aware (theoretical).'}]},
+      agents:{title:'Intelligent Agents',subtitle:'PERCEIVE, DECIDE, ACT',info:'<h3>WHAT IS AN INTELLIGENT AGENT?</h3><p>An agent is anything that perceives its environment through sensors and acts upon it through actuators to achieve goals. Examples: thermostat (simple), chess engine, self-driving car, ChatGPT.</p><h3>TYPES OF AGENTS</h3><ul><li>Simple Reflex Agent: condition-action rules only, no memory</li><li>Model-Based Reflex Agent: maintains internal model of world</li><li>Goal-Based Agent: considers future goals to choose actions</li><li>Utility-Based Agent: maximizes a utility function</li><li>Learning Agent: improves performance over time</li></ul><h3>PEAS DESCRIPTION</h3><p>Performance measure, Environment, Actuators, Sensors — framework to describe any agent task.</p>',logic:'<h3>RATIONAL AGENT</h3><p>A rational agent selects actions that maximize its expected performance measure based on its percept sequence and built-in knowledge. Rationality ≠ omniscience. A rational agent does the best with available information.</p>',qa:[{q:'What are the properties of an environment in AI?',a:'Observable (fully/partially), Deterministic vs Stochastic, Episodic vs Sequential, Static vs Dynamic, Discrete vs Continuous, Single vs Multi-agent. Most real-world problems are: partially observable, stochastic, sequential, dynamic, continuous, multi-agent — making them challenging!'},{q:'Explain PEAS with an example.', a:'Automated Taxi: Performance = safe, fast, legal driving, passenger comfort, maximize profit. Environment = roads, traffic, pedestrians, weather, GPS. Actuators = steering, accelerator, brake, signals, horn. Sensors = cameras, LIDAR, GPS, speedometer, microphone. Every AI system can be described using PEAS.'}]},
+      search:{title:'Search Algorithms in AI',subtitle:'FINDING SOLUTIONS IN STATE SPACES',info:'<h3>STATE SPACE SEARCH</h3><p>Problems are formulated as: Initial state → Actions → Transition model → Goal test → Path cost. Search finds a sequence of actions from initial to goal state.</p><h3>UNINFORMED SEARCH</h3><ul><li>BFS: complete, optimal (uniform cost), O(b^d) time & space</li><li>DFS: not optimal, O(bm) time, O(bm) space — can go infinite</li><li>Iterative Deepening DFS: combines BFS completeness with DFS space efficiency</li><li>Uniform Cost Search: optimal for varying costs, explores lowest-cost paths first</li></ul><h3>INFORMED SEARCH (HEURISTIC)</h3><ul><li>Greedy Best-First: uses h(n), fast but not optimal</li><li>A* Algorithm: uses f(n) = g(n) + h(n), optimal if h is admissible</li></ul>',logic:'<h3>A* ALGORITHM LOGIC</h3><p>f(n) = g(n) + h(n). g(n) = cost from start to n. h(n) = estimated cost from n to goal (heuristic). Priority queue ordered by f(n). Always expands lowest f-cost node. If h is admissible (never overestimates), A* is optimal. Example heuristic for maps: straight-line distance (always ≤ actual road distance).</p>',qa:[{q:'Why is A* better than Dijkstra\'s algorithm?',a:'Dijkstra\'s explores in all directions equally (no heuristic), finding shortest path to ALL reachable nodes. A* uses a heuristic to guide search toward the goal, exploring far fewer nodes. A* is essentially Dijkstra\'s with h(n). For single-target shortest path, A* is significantly faster. Dijkstra = h(n) always 0.'},{q:'What is an admissible heuristic?',a:'A heuristic h(n) is admissible if it never overestimates the true cost to reach the goal: h(n) ≤ h*(n) for all n. This guarantees A* finds the optimal solution. Example: straight-line distance for road maps is admissible. Inadmissible heuristics may find solutions faster but not necessarily optimal ones.'}]},
+      kr:{title:'Knowledge Representation',subtitle:'HOW AI STORES KNOWLEDGE',info:'<h3>WHY KNOWLEDGE REPRESENTATION?</h3><p>AI needs to store, organize, and use knowledge about the world. Different representations are suited for different types of knowledge.</p><h3>REPRESENTATION TYPES</h3><ul><li>Propositional Logic: true/false statements, limited expressiveness</li><li>First-Order Logic (FOL): objects, predicates, quantifiers — more expressive</li><li>Semantic Networks: graph of concepts and relationships</li><li>Frames: structured records like objects in OOP</li><li>Ontologies: formal vocabulary of concepts (OWL, RDF)</li><li>Production Rules: IF-THEN rules (Expert Systems)</li></ul>',logic:'<h3>FOL EXAMPLE</h3><p>All humans are mortal: ∀x Human(x) → Mortal(x). Socrates is human: Human(Socrates). Therefore Mortal(Socrates) — this is automated inference! FOL allows AI to reason about the world, not just match patterns.</p>',qa:[{q:'What are the desirable properties of a knowledge representation?',a:'Representational Adequacy (can represent all needed knowledge), Inferential Adequacy (can derive new knowledge), Inferential Efficiency (derive quickly), Acquisitional Efficiency (easy to add knowledge). No single representation excels at all — choice depends on problem. Propositional logic: fast inference, limited. FOL: expressive, undecidable in general.'}]},
+      qa:{title:'Predicted Q&A — AI Foundations',subtitle:'EXAM PREPARATION',info:'<h3>TOP PREDICTED QUESTIONS WITH ANSWERS</h3>',qa:[{q:'Compare BFS and DFS for AI search problems.',a:'BFS: explores level by level, uses FIFO queue, complete (finds solution if exists), optimal for uniform costs, O(b^d) time and space. DFS: explores depth-first, uses LIFO stack, not complete (can loop), not optimal, O(bm) time, O(bm) space. BFS preferred when solution is shallow; DFS when memory is limited or solution is deep.'},{q:'What is a heuristic function and give examples?',a:'A heuristic function h(n) estimates the cost from node n to the goal. It guides informed search algorithms. Examples: Manhattan distance for 8-puzzle (count of moves needed ignoring other tiles), Straight-line distance for route planning, Misplaced tiles for 8-puzzle (count tiles not in goal position). Good heuristics are admissible and consistent.'},{q:'Explain the concept of rationality in AI.',a:'A rational agent acts to maximize its expected performance based on its percept sequence and prior knowledge. Rationality depends on: the performance measure, agent\'s prior knowledge, possible actions, and percept sequence. Rationality ≠ perfection (no omniscience). Rational agents are expected to do the best they can with available information.'},{q:'What is the difference between supervised and unsupervised learning?',a:'Supervised Learning: training data has labels (input-output pairs). Agent learns mapping from input to output. Examples: classification, regression. Unsupervised Learning: no labels, find hidden patterns/structure. Examples: clustering, dimensionality reduction, generative models. Semi-supervised uses small labeled + large unlabeled data.'}]}
+    }
+  },
+  ml:{title:'Machine Learning',topics:[{id:'intro',label:'ML Introduction',sub:'Types & Concepts'},{id:'regression',label:'Regression',sub:'Linear & Logistic'},{id:'classification',label:'Classification',sub:'SVM, Decision Trees'},{id:'clustering',label:'Clustering',sub:'K-Means, DBSCAN'},{id:'eval',label:'Model Evaluation',sub:'Metrics'},{id:'qa',label:'Predicted Q&A',sub:'Exam Prep'}],
+  content:{
+    intro:{title:'Introduction to Machine Learning',subtitle:'LEARNING FROM DATA',info:'<h3>WHAT IS MACHINE LEARNING?</h3><p>ML is a branch of AI where systems learn from data and improve over time without being explicitly programmed. Instead of writing rules, we feed data and let the algorithm find patterns.</p><h3>TYPES OF ML</h3><ul><li>Supervised Learning: labeled data, predict output (classification, regression)</li><li>Unsupervised Learning: unlabeled data, find structure (clustering, dimensionality reduction)</li><li>Semi-Supervised: few labeled + many unlabeled examples</li><li>Reinforcement Learning: agent learns from rewards/penalties</li><li>Self-Supervised: labels generated from data itself (GPT pre-training)</li></ul><h3>ML PIPELINE</h3><p>Data Collection → Data Cleaning → Feature Engineering → Model Selection → Training → Evaluation → Deployment → Monitoring</p>',logic:'<h3>THE BIAS-VARIANCE TRADEOFF</h3><p>Bias: error from wrong assumptions (underfitting — model too simple). Variance: error from sensitivity to small fluctuations in training data (overfitting — model too complex). Goal: find the sweet spot. Techniques: cross-validation, regularization (L1/L2), dropout, early stopping, more data.</p>',qa:[{q:'What is the difference between a parameter and a hyperparameter?',a:'Parameters: learned from data during training (weights, biases in neural networks, split thresholds in decision trees). Hyperparameters: set before training, control the learning process (learning rate, number of layers, number of trees, regularization strength). Hyperparameter tuning: grid search, random search, Bayesian optimization.'},{q:'What is cross-validation and why is it important?',a:'Cross-validation evaluates model performance on unseen data. K-Fold CV: split data into k subsets, train on k-1, test on 1, repeat k times, average results. Prevents overfitting to a specific train/test split. More reliable estimate than single train-test split. Common values: k=5 or k=10.'}]},
+    regression:{title:'Regression',subtitle:'PREDICTING CONTINUOUS VALUES',info:'<h3>LINEAR REGRESSION</h3><p>Models relationship between features and continuous target as: y = mx + b (simple) or y = w₁x₁ + w₂x₂ + ... + b (multiple). Learns weights by minimizing Mean Squared Error using gradient descent or closed-form solution.</p><h3>LOGISTIC REGRESSION</h3><p>Despite the name, it\'s a classification algorithm! Uses sigmoid function to output probability (0 to 1). Decision boundary: probability > 0.5 → class 1. Minimizes cross-entropy loss.</p><h3>REGULARIZATION</h3><ul><li>L1 (Lasso): adds |w| to loss, performs feature selection (drives some weights to 0)</li><li>L2 (Ridge): adds w² to loss, shrinks all weights, prevents overfitting</li><li>Elastic Net: combination of L1 and L2</li></ul>',logic:'<h3>GRADIENT DESCENT LOGIC</h3><p>Start with random weights. Compute loss. Compute gradient (partial derivative of loss w.r.t. weights). Update: w = w - α × gradient. Repeat until convergence. Learning rate α controls step size. Too large → overshoots. Too small → slow. Adam optimizer adapts learning rate per parameter.</p>',qa:[{q:'What is multicollinearity and how do you handle it?',a:'Multicollinearity occurs when two or more features are highly correlated, making it hard to estimate individual feature effects. Detection: correlation matrix, VIF (Variance Inflation Factor). Solutions: remove one of the correlated features, use PCA for dimensionality reduction, use Ridge regression (L2 regularization handles correlated features better than OLS).'}]},
+    classification:{title:'Classification',subtitle:'SVM, DECISION TREES, RANDOM FORESTS',info:'<h3>SUPPORT VECTOR MACHINES (SVM)</h3><p>Finds the hyperplane that maximally separates classes (maximum margin classifier). Support vectors are the data points closest to the hyperplane. Kernel trick maps data to higher dimensions for non-linear separation (RBF, polynomial kernels).</p><h3>DECISION TREES</h3><p>Splits data recursively based on features to minimize impurity. Impurity measures: Gini Index (used in CART), Information Gain/Entropy (used in ID3, C4.5). Prone to overfitting — use pruning or ensembles.</p><h3>RANDOM FORESTS</h3><p>Ensemble of decision trees, each trained on random subset of data (bagging) and random subset of features. Aggregates predictions by majority vote (classification) or average (regression). Very robust, handles high dimensions well.</p>',logic:'<h3>INFORMATION GAIN LOGIC</h3><p>Entropy H(S) = -Σ p(c) log₂ p(c). IG(S, A) = H(S) - Σ (|Sv|/|S|) × H(Sv). Choose the split that maximizes information gain — the feature that most reduces uncertainty. This is how decision trees greedily select the best split at each node.</p>',qa:[{q:'What is the kernel trick in SVM?',a:'The kernel trick implicitly maps data to a higher-dimensional space without explicitly computing the transformation, making non-linearly separable data linearly separable. K(x,y) = φ(x)·φ(y). Common kernels: Linear (no mapping), Polynomial (K=(x·y+c)^d), RBF/Gaussian (K=exp(-γ||x-y||²)). Computationally efficient despite potentially infinite dimensions.'},{q:'What is the difference between bagging and boosting?',a:'Bagging (Bootstrap Aggregating): trains multiple independent models on random data subsets, aggregates by voting/averaging. Reduces variance (Random Forest uses bagging). Boosting: trains models sequentially, each correcting errors of previous. Reduces bias (AdaBoost, XGBoost, Gradient Boosting). Boosting usually achieves better accuracy but is more prone to overfitting and slower.'}]},
+    clustering:{title:'Clustering',subtitle:'UNSUPERVISED GROUPING',info:'<h3>K-MEANS CLUSTERING</h3><p>Algorithm: 1) Choose k random centroids. 2) Assign each point to nearest centroid. 3) Recompute centroids as mean of assigned points. 4) Repeat until convergence. Minimizes intra-cluster variance. Must specify k. Sensitive to initialization and outliers.</p><h3>DBSCAN</h3><p>Density-Based Spatial Clustering. Groups points that are closely packed. Can find arbitrarily shaped clusters. Automatically finds k. Handles outliers (labels them as noise). Parameters: epsilon (neighborhood radius), minPts (minimum points in neighborhood).</p><h3>CHOOSING K</h3><ul><li>Elbow Method: plot inertia vs k, find elbow point</li><li>Silhouette Score: measures how similar object is to own cluster vs others</li></ul>',logic:'<h3>WHY K-MEANS CAN FAIL</h3><p>K-means assumes spherical, equally-sized clusters. Fails for: elongated clusters, varying density clusters, clusters within clusters. DBSCAN doesn\'t make these assumptions — use it for irregular shapes. For high-dimensional data, consider Gaussian Mixture Models (soft assignments).</p>',qa:[{q:'What is the difference between K-Means and Hierarchical Clustering?',a:'K-Means: non-hierarchical, need to specify k, fast O(nkd), results vary with initialization. Hierarchical: creates dendrogram (tree of clusters), no need to specify k upfront, more informative visualization, O(n²) time — slow for large data. Agglomerative (bottom-up) is most common. Cut dendrogram at desired level to get k clusters.'}]},
+    eval:{title:'Model Evaluation',subtitle:'METRICS & VALIDATION',info:'<h3>CLASSIFICATION METRICS</h3><ul><li>Accuracy = (TP+TN)/(TP+TN+FP+FN) — misleading for imbalanced classes</li><li>Precision = TP/(TP+FP) — when false positives are costly (spam filter)</li><li>Recall/Sensitivity = TP/(TP+FN) — when false negatives are costly (disease detection)</li><li>F1 Score = 2×(Precision×Recall)/(Precision+Recall) — harmonic mean</li><li>ROC-AUC: model\'s ability to discriminate classes at various thresholds</li></ul><h3>REGRESSION METRICS</h3><ul><li>MAE: mean absolute error, robust to outliers</li><li>MSE: mean squared error, penalizes large errors more</li><li>RMSE: interpretable, same units as target</li><li>R²: proportion of variance explained</li></ul>',logic:'<h3>WHEN TO USE WHAT METRIC</h3><p>Medical diagnosis (cancer detection): maximize Recall — missing a cancer (FN) is worse than false alarm (FP). Spam filter: maximize Precision — sending spam to inbox (FN) is okay but blocking real emails (FP) is bad. Imbalanced dataset: use F1 or AUC, not accuracy. Financial fraud detection: use AUC-PR (Precision-Recall curve).</p>',qa:[{q:'What is the ROC curve and AUC?',a:'ROC (Receiver Operating Characteristic) curve plots True Positive Rate (Recall) vs False Positive Rate at different classification thresholds. AUC (Area Under Curve) = probability that model ranks a random positive example higher than a random negative. AUC = 1 is perfect, 0.5 is random. Better for imbalanced datasets than accuracy. Model with higher AUC has better discrimination ability.'}]},
+    qa:{title:'Predicted Q&A — Machine Learning',subtitle:'EXAM PREPARATION',info:'<h3>COMPREHENSIVE EXAM Q&A</h3>',qa:[{q:'Explain the bias-variance tradeoff with examples.',a:'Bias: systematic error from wrong assumptions. High bias = underfitting (simple model). Example: fitting a straight line to quadratic data. Variance: sensitivity to training data fluctuations. High variance = overfitting (too complex model). Example: memorizing training data but failing on new data. Goal: find sweet spot. Solutions: more data (reduces variance), regularization (reduces variance), better features (reduces bias), ensemble methods.'},{q:'What is gradient descent and its variants?',a:'Gradient Descent minimizes loss by iteratively moving in direction of steepest descent. Batch GD: uses all data per update (slow but stable). Stochastic GD (SGD): uses one sample per update (fast but noisy). Mini-batch GD: uses small batch (best of both). Advanced: Momentum (speeds up convergence), RMSprop (adaptive LR), Adam (momentum + adaptive LR) — most commonly used.'},{q:'How do you handle imbalanced datasets?',a:'1. Resampling: oversample minority (SMOTE creates synthetic samples) or undersample majority. 2. Class weights: penalize misclassification of minority class more. 3. Use appropriate metrics (F1, AUC instead of accuracy). 4. Ensemble methods like BalancedRandomForest. 5. Anomaly detection approach for extreme imbalance (fraud: 0.1% positive). 6. Collect more data for minority class.'}]}
+  }},
+  dl:{title:'Deep Learning',topics:[{id:'nn',label:'Neural Networks',sub:'Foundation'},{id:'cnn',label:'CNN',sub:'Image Processing'},{id:'rnn',label:'RNN & LSTM',sub:'Sequential Data'},{id:'trans',label:'Transformers',sub:'Attention Mechanism'},{id:'qa',label:'Predicted Q&A',sub:'Exam Prep'}],
+  content:{
+    nn:{title:'Neural Networks',subtitle:'THE FOUNDATION OF DEEP LEARNING',info:'<h3>BIOLOGICAL INSPIRATION</h3><p>Neural networks are loosely inspired by the brain. Neurons (nodes) receive inputs, apply weights, sum up, pass through activation function, produce output.</p><h3>ARCHITECTURE</h3><ul><li>Input Layer: receives features</li><li>Hidden Layers: learn representations</li><li>Output Layer: produces prediction</li><li>Weights & Biases: learnable parameters</li></ul><h3>ACTIVATION FUNCTIONS</h3><ul><li>Sigmoid: σ(x) = 1/(1+e^-x), range (0,1) — vanishing gradient problem</li><li>Tanh: range (-1,1) — better than sigmoid but still vanishing gradient</li><li>ReLU: max(0,x) — most popular, no vanishing gradient, dying ReLU problem</li><li>Leaky ReLU: small slope for x < 0, fixes dying ReLU</li><li>Softmax: multi-class output probabilities (sum to 1)</li></ul>',logic:'<h3>BACKPROPAGATION LOGIC</h3><p>Forward pass: compute predictions and loss. Backward pass: compute gradient of loss w.r.t. each weight using chain rule. Update weights: w = w - α × ∂L/∂w. The "back" in backpropagation: gradients flow from output layer back to input layer. Without backprop, training deep networks would be impossible.</p>',qa:[{q:'What is the vanishing gradient problem?',a:'In deep networks with sigmoid/tanh, gradients become very small as they backpropagate through many layers. Multiplying many small values (<1) makes gradient approach 0 — early layers learn extremely slowly. Solutions: ReLU activation, batch normalization, residual connections (ResNets skip connections add gradient highways), proper weight initialization (Xavier, He).'}]},
+    cnn:{title:'Convolutional Neural Networks',subtitle:'SEEING AND UNDERSTANDING IMAGES',info:'<h3>KEY LAYERS</h3><ul><li>Convolutional Layer: applies filters to detect local patterns (edges, textures). Each filter learns a feature. Multiple filters per layer.</li><li>Pooling Layer: reduces spatial dimensions. Max pooling takes maximum in window. Provides translation invariance.</li><li>Fully Connected Layer: at end, flattens and classifies using learned features.</li></ul><h3>FAMOUS ARCHITECTURES</h3><ul><li>LeNet (1998): first practical CNN</li><li>AlexNet (2012): deep learning breakthrough, won ImageNet</li><li>VGG (2014): very deep, simple architecture</li><li>ResNet (2015): residual connections, 152 layers, solved vanishing gradient</li><li>EfficientNet: scales width, depth, resolution efficiently</li></ul>',logic:'<h3>WHY CONVOLUTION WORKS</h3><p>A filter slides over the image computing dot products. Early layers detect edges (simple patterns). Middle layers detect shapes/textures. Deep layers detect high-level features (faces, objects). This hierarchical feature learning is why CNNs work so well for images — parameter sharing (same filter applied everywhere) makes it efficient.</p>',qa:[{q:'What is transfer learning and when to use it?',a:'Transfer learning uses a model pre-trained on a large dataset (like ImageNet) as starting point for a new task. Fine-tuning: unfreeze last few layers and train on new data. Feature extraction: freeze all layers, only train new output head. Use when: limited data (most common case), similar domain to pre-training. Dramatically reduces training time and data requirements. Foundational in modern CV and NLP.'}]},
+    rnn:{title:'RNN & LSTM',subtitle:'SEQUENTIAL DATA PROCESSING',info:'<h3>RECURRENT NEURAL NETWORKS</h3><p>RNNs process sequential data by maintaining a hidden state that captures information about previous inputs. Same weights used at each time step. Can handle variable-length sequences.</p><h3>VANISHING GRADIENT IN RNNs</h3><p>Long-range dependencies are lost — gradients vanish over many time steps. Can\'t remember things from many steps ago.</p><h3>LSTM (Long Short-Term Memory)</h3><ul><li>Cell State: long-term memory highway</li><li>Forget Gate: what to erase from cell state</li><li>Input Gate: what new info to add</li><li>Output Gate: what to output based on cell state</li></ul><p>LSTM can learn to remember relevant information for hundreds of steps!</p>',logic:'<h3>GRU — SIMPLIFIED LSTM</h3><p>Gated Recurrent Unit combines forget and input gates into update gate + reset gate. Fewer parameters than LSTM, similar performance. Easier to train. Used widely in practice.</p><p><strong>Applications:</strong> Machine translation, Speech recognition, Time series prediction, Stock prices, Music generation, Text generation.</p>',qa:[{q:'What is the difference between LSTM and GRU?',a:'LSTM has 3 gates (forget, input, output) and separate cell state and hidden state. GRU has 2 gates (update, reset) and only hidden state. GRU: fewer parameters (faster training), comparable performance. LSTM: more expressive, better for very long sequences. In practice, GRU often matches LSTM and is preferred for speed. Both solve vanishing gradient problem.'}]},
+    trans:{title:'Transformers & Attention',subtitle:'THE ARCHITECTURE BEHIND GPT AND BERT',info:'<h3>SELF-ATTENTION MECHANISM</h3><p>Attention allows the model to focus on relevant parts of the input when producing output. Self-attention: each position in sequence attends to all other positions. Captures long-range dependencies in O(1) layers (vs O(n) for RNNs)!</p><h3>TRANSFORMER ARCHITECTURE</h3><ul><li>Multi-Head Attention: multiple attention heads capture different relationships</li><li>Positional Encoding: adds position information (since no recurrence)</li><li>Feed-Forward Layers: applies same network to each position</li><li>Layer Normalization: stabilizes training</li><li>Encoder-Decoder: original architecture (translation); Encoder-only (BERT); Decoder-only (GPT)</li></ul>',logic:'<h3>ATTENTION FORMULA</h3><p>Attention(Q, K, V) = softmax(QK^T / √d_k) × V. Queries, Keys, Values. The dot product QK^T measures similarity. Dividing by √d_k prevents softmax from saturating. Softmax gives attention weights (sum to 1). Weighted sum of values is the output. Like a soft dictionary lookup!</p>',qa:[{q:'Why did Transformers replace RNNs?',a:'RNNs process sequentially — can\'t parallelize, slow training. Vanishing gradients limit long-range dependencies. Transformers: fully parallelizable (all positions processed simultaneously), better long-range dependencies via attention, scale better with more data/compute. The 2017 paper "Attention Is All You Need" showed attention alone is sufficient, removing recurrence entirely. Led to BERT, GPT, T5, and all modern LLMs.'},{q:'What is BERT and how does it differ from GPT?',a:'BERT (Bidirectional Encoder Representations from Transformers): encoder-only, reads text in both directions, pre-trained with masked language modeling. Good for understanding tasks (classification, NER, QA). GPT (Generative Pre-trained Transformer): decoder-only, reads left-to-right, pre-trained with next-word prediction. Good for generation tasks. BERT excels at comprehension; GPT excels at generation.'}]},
+    qa:{title:'Predicted Q&A — Deep Learning',subtitle:'EXAM PREPARATION',info:'<h3>COMPREHENSIVE EXAM Q&A</h3>',qa:[{q:'What is batch normalization and why is it important?',a:'Batch Normalization normalizes the inputs to each layer (zero mean, unit variance) during training. Benefits: allows higher learning rates, reduces dependence on careful initialization, acts as regularization (reduces need for dropout), accelerates training. Works by normalizing over a mini-batch, then applying learnable scale and shift parameters. Major factor in making deep networks trainable.'},{q:'Explain dropout regularization.',a:'Dropout randomly deactivates neurons (sets to 0) during training with probability p (typically 0.5). Prevents co-adaptation — neurons can\'t rely on specific other neurons. Forces redundant representations. At inference, multiply by (1-p) to compensate. Equivalently, scale during training (inverted dropout). Effectively trains an ensemble of 2^n networks. Major regularization technique, especially effective for fully-connected layers.'},{q:'What is the difference between L1 and L2 regularization?',a:'L1 (Lasso): adds Σ|w| to loss. Produces sparse weights (many exactly zero). Acts as automatic feature selection. More robust to outliers. Non-differentiable at 0. L2 (Ridge/Weight Decay): adds Σw² to loss. Shrinks all weights toward zero but rarely to exactly zero. Differentiable everywhere. Closed-form solution exists. L1 for feature selection; L2 for general regularization. Deep learning typically uses L2 (weight decay) or dropout.'}]}
+  }},
+  nlp:{title:'Natural Language Processing',topics:[{id:'intro',label:'NLP Basics',sub:'Text Processing'},{id:'lm',label:'Language Models',sub:'N-Gram to BERT'},{id:'tasks',label:'NLP Tasks',sub:'Classification, NER, QA'},{id:'qa',label:'Predicted Q&A',sub:'Exam Prep'}],
+  content:{
+    intro:{title:'NLP Basics',subtitle:'PROCESSING HUMAN LANGUAGE',info:'<h3>TEXT PREPROCESSING PIPELINE</h3><ul><li>Tokenization: split text into words/subwords/characters</li><li>Lowercasing: normalize case</li><li>Stop Word Removal: remove common words (the, is, at)</li><li>Stemming: reduce to root (running→run, using Porter/Snowball)</li><li>Lemmatization: linguistic root form (better→good, are→be)</li><li>POS Tagging: noun, verb, adjective labels</li><li>NER: identify entities (person, location, organization)</li></ul><h3>TEXT REPRESENTATION</h3><ul><li>Bag of Words: word frequency vector, ignores order</li><li>TF-IDF: downweights common words, upweights rare important words</li><li>Word2Vec: dense embeddings, captures semantic similarity</li><li>BERT embeddings: contextual — same word, different context → different embedding</li></ul>',logic:'<h3>WORD EMBEDDINGS INTUITION</h3><p>Word2Vec: "King" - "Man" + "Woman" ≈ "Queen". Words with similar contexts have similar embeddings. Trained by predicting context words (Skip-gram) or predicting word from context (CBOW). Embedding dimension: 100-300. Captures analogy, semantic similarity, syntactic relationships. Revolutionized NLP before BERT.</p>',qa:[{q:'What is the difference between stemming and lemmatization?',a:'Stemming: rule-based, removes suffixes mechanically. Fast but crude — "studies"→"studi" (not a real word). Doesn\'t consider context. Lemmatization: uses vocabulary and morphological analysis. Returns real word — "studies"→"study", "better"→"good". Context-aware (knows if word is verb/noun). Slower but more accurate. Use lemmatization for NLP tasks needing meaning; stemming for fast information retrieval.'}]},
+    lm:{title:'Language Models',subtitle:'FROM N-GRAM TO GPT',info:'<h3>N-GRAM LANGUAGE MODELS</h3><p>Probability of a word given previous n-1 words. Bigram: P(w|previous word). Problem: data sparsity (unseen n-grams have zero probability) → smoothing (Laplace, Kneser-Ney). Limitation: can\'t capture long-range dependencies.</p><h3>NEURAL LANGUAGE MODELS</h3><ul><li>Feed-Forward LM: fixed context window, word embeddings</li><li>RNN-LM: variable context, but slow and vanishing gradient</li><li>LSTM-LM: better long-range, used in early text generation</li><li>Transformer LM (GPT): parallelizable, captures very long range, scales to billions of parameters</li></ul>',logic:'<h3>WHY GPT WORKS SO WELL</h3><p>Scale + Data + Architecture. Training: predict next token given previous tokens (autoregressive). With enough data and parameters, model learns not just language but world knowledge, reasoning, code — emergent capabilities appear as scale increases. In-context learning: GPT can learn tasks from examples in the prompt without gradient updates!</p>',qa:[{q:'What is perplexity in language models?',a:'Perplexity measures how well a language model predicts a test set. PP(W) = P(w₁,w₂,...,wN)^(-1/N). Lower perplexity = better model. Intuitively: average branching factor — how "surprised" the model is by the text. Perplexity 10 means model is as confused as if choosing uniformly from 10 options at each step. Standard evaluation metric for language models.'}]},
+    tasks:{title:'NLP Tasks',subtitle:'CLASSIFICATION, NER, QA, TRANSLATION',info:'<h3>SENTIMENT ANALYSIS</h3><p>Classify text as positive/negative/neutral. Applications: product reviews, social media monitoring, customer feedback. Approaches: lexicon-based (SentiWordNet), ML (Naive Bayes, SVM), Deep Learning (LSTM, BERT fine-tuning).</p><h3>NAMED ENTITY RECOGNITION (NER)</h3><p>Identify and classify named entities: PERSON, ORGANIZATION, LOCATION, DATE, MONEY. Used in information extraction, knowledge graph building, question answering.</p><h3>MACHINE TRANSLATION</h3><p>Sequence-to-sequence with attention (Encoder-Decoder). Pre-Transformer: LSTM+attention. Post-2017: Transformer dominates. Google Translate uses Transformer. Key challenge: preserving meaning across languages.</p>',logic:'<h3>FINE-TUNING BERT FOR NLP TASKS</h3><p>Pre-train BERT on masked LM + next sentence prediction (billions of tokens). Fine-tune: add task-specific head (classification layer) and train on small labeled dataset (a few thousand examples). Works for: text classification, NER, QA, sentiment analysis. Few hours of fine-tuning achieves state-of-the-art on most NLP benchmarks!</p>',qa:[{q:'What is BLEU score?',a:'BLEU (Bilingual Evaluation Understudy) evaluates machine translation quality by comparing to human references. Counts n-gram overlaps between generated and reference translations. Score 0-1 (or 0-100). Limitations: doesn\'t capture semantics, can miss correct paraphrases, doesn\'t evaluate fluency well. Still widely used as quick baseline metric. Newer metrics: ROUGE (summarization), BERTScore (semantic similarity using BERT embeddings).'}]},
+    qa:{title:'Predicted Q&A — NLP',subtitle:'EXAM PREPARATION',info:'<h3>COMPREHENSIVE NLP EXAM Q&A</h3>',qa:[{q:'Explain the attention mechanism in the context of NLP.',a:'Attention allows the decoder to look at relevant parts of the input when generating each output word. For each output position, compute attention score for each input position (dot product of decoder hidden state and encoder hidden states). Softmax to get attention weights (sum to 1). Weighted sum of encoder states = context vector. Significantly improved translation quality. Self-attention (Transformer): each position attends to all positions in same sequence — captures dependencies regardless of distance.'},{q:'What are transformers and why are they important for NLP?',a:'Transformers (Vaswani et al. 2017) use self-attention instead of recurrence. Key advantages: Parallelizable (process all positions simultaneously — much faster training), better long-range dependencies, scales to huge datasets. Led to: BERT (bidirectional encoder), GPT (autoregressive decoder), T5 (encoder-decoder), and all modern LLMs. Replaced RNNs as default NLP architecture. Foundation of ChatGPT, Gemini, Claude, Llama.'},{q:'What is transfer learning in NLP?',a:'Transfer learning: pre-train a model on large corpus (captures general language knowledge), then fine-tune on specific task with small labeled data. Pre-training: BERT uses masked LM (predict masked words) + next sentence prediction. GPT uses causal LM (predict next word). Fine-tuning: add task head, train a few epochs on labeled data. Dramatically reduces need for labeled data. BERT fine-tuned on 1000 examples often beats task-specific models trained on millions.'}]}
+  }},
+  cv:{title:'Computer Vision',topics:[{id:'intro',label:'Image Processing',sub:'Basics'},{id:'obj',label:'Object Detection',sub:'YOLO, R-CNN'},{id:'seg',label:'Image Segmentation',sub:'Semantic & Instance'},{id:'qa',label:'Predicted Q&A',sub:'Exam Prep'}],
+  content:{
+    intro:{title:'Image Processing Basics',subtitle:'UNDERSTANDING VISUAL DATA',info:'<h3>DIGITAL IMAGE FUNDAMENTALS</h3><p>An image is a 2D array of pixels. Grayscale: 1 channel (0-255). Color (RGB): 3 channels. Operations: resize, crop, rotate, flip, normalize (divide by 255).</p><h3>CLASSICAL IMAGE PROCESSING</h3><ul><li>Edge Detection: Sobel, Canny operator</li><li>Filtering: Gaussian blur (noise removal), sharpening</li><li>Thresholding: convert to binary</li><li>Morphological operations: erosion, dilation</li><li>Feature Detection: SIFT, SURF, ORB (keypoints)</li></ul><h3>OPENCV BASICS</h3><p>img = cv2.imread("img.jpg") → BGR format. cv2.cvtColor() for color conversion. cv2.resize() for resizing. cv2.GaussianBlur() for smoothing.</p>',logic:'<h3>WHY DEEP LEARNING BEATS CLASSICAL CV</h3><p>Classical CV: hand-crafted features (engineer decides what to look for). Works for simple, controlled settings. Deep Learning: learns features automatically from data. Better at handling complex variations (lighting, pose, occlusion). CNN features are learned — not engineered. Modern CV uses deep learning for almost everything.</p>',qa:[{q:'What is data augmentation in computer vision?',a:'Data augmentation artificially increases training set size by applying transformations: random crop, horizontal flip, rotation, color jitter, brightness/contrast change, cutout, mixup. Helps model generalize better, reduces overfitting. Especially valuable for small datasets. Popular libraries: torchvision.transforms, albumentations. Test Time Augmentation (TTA): apply augmentations at inference, average predictions — improves accuracy.'}]},
+    obj:{title:'Object Detection',subtitle:'YOLO, R-CNN, SSD',info:'<h3>TWO-STAGE DETECTORS</h3><p>R-CNN: Extract region proposals → CNN features per region → classify. Slow (2000 regions per image). Fast R-CNN: CNN on whole image, then ROI pooling. Faster R-CNN: Region Proposal Network (RPN) shares CNN with detection network. Accurate but slower.</p><h3>ONE-STAGE DETECTORS</h3><p>YOLO (You Only Look Once): divides image into SxS grid, each cell predicts boxes and classes simultaneously. Single forward pass = very fast (real-time)! SSD (Single Shot Detector): similar idea, multi-scale feature maps. Trade-off: speed vs accuracy vs small object detection.</p><h3>MODERN DETECTORS</h3><p>YOLOv8, DETR (detection transformer), EfficientDet — state of the art.</p>',logic:'<h3>YOLO LOGIC</h3><p>Grid: 13×13 cells. Each cell predicts B bounding boxes (x,y,w,h,confidence) + C class probabilities. Final predictions: B×(5+C) per cell. Non-Maximum Suppression (NMS): removes duplicate detections. IoU (Intersection over Union): measures overlap between predicted and ground truth boxes. mAP (mean Average Precision): evaluation metric.</p>',qa:[{q:'What is IoU and why is it important in object detection?',a:'IoU = Area of Intersection / Area of Union between predicted bounding box and ground truth box. Range: 0 (no overlap) to 1 (perfect match). Used to determine if a detection is correct (TP if IoU > threshold, typically 0.5). Foundation of mAP calculation. NMS uses IoU to remove duplicate detections: if two boxes detect same object with IoU > 0.5, keep highest confidence, discard other.'}]},
+    seg:{title:'Image Segmentation',subtitle:'PIXEL-LEVEL UNDERSTANDING',info:'<h3>TYPES OF SEGMENTATION</h3><ul><li>Semantic Segmentation: classify each pixel into a category (all cars = same label). U-Net, DeepLab.</li><li>Instance Segmentation: separate instances of same class (car₁, car₂, car₃). Mask R-CNN.</li><li>Panoptic Segmentation: combines both — semantic (sky, road) + instance (person₁, car₂).</li></ul><h3>U-NET</h3><p>Encoder-decoder with skip connections. Encoder: downsamples (extracts features). Decoder: upsamples (produces segmentation mask). Skip connections: concatenate encoder features to decoder — preserve spatial details. Originally for medical image segmentation. Works well with small datasets.</p>',logic:'<h3>APPLICATIONS</h3><p>Autonomous driving (road, lane, pedestrian segmentation), Medical imaging (tumor detection, organ segmentation), Satellite imagery analysis, AR/VR (background removal), Industrial inspection.</p>',qa:[{q:'What is the difference between semantic and instance segmentation?',a:'Semantic segmentation assigns a class label to every pixel — all pixels belonging to "car" get the same label. Can\'t distinguish between multiple cars. Instance segmentation identifies and segments individual object instances separately — car₁ and car₂ get different labels. Instance segmentation is harder (requires detecting individual objects). Mask R-CNN is the standard instance segmentation model.'}]},
+    qa:{title:'Predicted Q&A — Computer Vision',subtitle:'EXAM PREPARATION',info:'<h3>COMPREHENSIVE CV EXAM Q&A</h3>',qa:[{q:'How does a CNN process an image?',a:'1. Convolutional layers apply learned filters — early layers detect edges/corners, deep layers detect complex features. 2. Pooling layers downsample feature maps. 3. The process hierarchically builds representations. 4. Fully connected layers at end classify based on extracted features. Same filter applied across entire image (weight sharing) — dramatically fewer parameters than fully connected. Translation invariance from pooling.'},{q:'What is transfer learning in Computer Vision?',a:'Use model pre-trained on ImageNet (1.2M images, 1000 classes) as feature extractor. Features from early/middle layers are generic (edges, textures) and transfer well to new tasks. Fine-tuning: train the whole model on new data (large new dataset). Feature extraction: freeze CNN, only train new classification head (small new dataset). Tools: torchvision.models (ResNet, VGG, EfficientNet pre-trained). Reduces training from days to hours, data from millions to thousands.'},{q:'Explain the architecture of ResNet.',a:'ResNet (He et al. 2015) introduced residual/skip connections: F(x) + x where F(x) is the learned residual. Allows gradient to flow directly through skip connections — solves vanishing gradient in very deep networks. ResNet-50 (50 layers), ResNet-101, ResNet-152. Key insight: it\'s easier to learn zero residual (no change) than identity function — layers are always incrementally improving. Enabled training 100+ layer networks.'}]}
+  }},
+  rl:{title:'Reinforcement Learning',topics:[{id:'intro',label:'RL Basics',sub:'MDP Framework'},{id:'qlearn',label:'Q-Learning',sub:'Value-Based'},{id:'pg',label:'Policy Gradient',sub:'Policy-Based'},{id:'deeprl',label:'Deep RL',sub:'DQN, A3C'},{id:'qa',label:'Predicted Q&A',sub:'Exam Prep'}],
+  content:{
+    intro:{title:'Reinforcement Learning Basics',subtitle:'LEARNING FROM REWARDS',info:'<h3>RL FRAMEWORK</h3><p>Agent interacts with Environment. At each step: Agent observes State, takes Action, receives Reward, transitions to new State. Goal: maximize cumulative reward (return).</p><h3>MARKOV DECISION PROCESS (MDP)</h3><p>MDP = (S, A, P, R, γ). S = state space, A = action space, P = transition probability P(s\'|s,a), R = reward function R(s,a,s\'), γ = discount factor (0-1). Markov property: future depends only on current state, not history.</p><h3>KEY CONCEPTS</h3><ul><li>Policy π(a|s): probability of taking action a in state s</li><li>Value function V(s): expected return from state s following policy π</li><li>Q-function Q(s,a): expected return starting from s, taking action a</li><li>Bellman Equation: recursive relationship between V(s) and V(s\')</li></ul>',logic:'<h3>EXPLORATION vs EXPLOITATION</h3><p>Agent must balance: Exploitation (use current knowledge — take best known action) vs Exploration (try new actions — might find better rewards). ε-greedy: with probability ε take random action, else take greedy action. Decrease ε over time (start exploring, gradually exploit more). Too much exploitation → stuck at local optimum. Too much exploration → slow learning.</p>',qa:[{q:'What is the Bellman equation?',a:'Bellman equation expresses value function recursively: V(s) = R(s) + γ × max_a Σ P(s\'|s,a) × V(s\'). Optimal value = immediate reward + discounted value of best reachable next state. Foundation of dynamic programming in RL. Q-version: Q(s,a) = R(s,a) + γ × max_a\' Q(s\',a\'). This recursive structure allows bootstrapping — update estimates using other estimates (TD learning).'}]},
+    qlearn:{title:'Q-Learning',subtitle:'VALUE-BASED REINFORCEMENT LEARNING',info:'<h3>Q-LEARNING ALGORITHM</h3><p>Off-policy temporal difference algorithm. Learns Q*(s,a) — optimal action-value function.</p><p>Update rule: Q(s,a) ← Q(s,a) + α[r + γ max_a\' Q(s\',a\') - Q(s,a)]</p><ul><li>α = learning rate</li><li>r = received reward</li><li>γ = discount factor</li><li>max_a\' Q(s\',a\') = best Q value in next state</li><li>[r + γ max Q(s\',a\') - Q(s,a)] = TD error</li></ul><p>Converges to optimal policy for finite MDPs with enough exploration. Uses Q-table: states × actions matrix.</p>',logic:'<h3>Q-LEARNING INTUITION</h3><p>Think of the Q-table as a cheat sheet telling you how good each action is in each state. Initially random. After each experience, update the entry using the Bellman equation. Over thousands of episodes, Q-values converge to true values. Then policy: always pick action with highest Q-value (greedy).</p>',qa:[{q:'What is the difference between on-policy and off-policy learning?',a:'On-policy: learns value of the policy being used to make decisions (same policy for behavior and evaluation). SARSA is on-policy — updates Q(s,a) using the actual action taken (including ε-greedy exploration). Off-policy: learns optimal policy while following different (exploratory) behavior policy. Q-Learning is off-policy — always updates using max_a Q(s\',a\') regardless of action actually taken. Off-policy generally more sample efficient; on-policy more stable.'}]},
+    pg:{title:'Policy Gradient Methods',subtitle:'DIRECTLY OPTIMIZING THE POLICY',info:'<h3>POLICY GRADIENT IDEA</h3><p>Instead of learning value function, directly parameterize policy π_θ(a|s) and optimize θ using gradient ascent on expected reward.</p><p>REINFORCE algorithm: θ ← θ + α Σ G_t ∇ log π(a_t|s_t). G_t = discounted return from timestep t. Increase probability of actions that led to high return. Decrease probability of actions that led to low return.</p><h3>ACTOR-CRITIC</h3><p>Combines policy gradient (actor) with value function (critic). Critic evaluates actions taken by actor using TD learning. Reduces variance of policy gradient. Foundation of A2C, A3C, PPO.</p>',logic:'<h3>WHY POLICY GRADIENT OVER Q-LEARNING?</h3><p>Q-Learning fails for continuous action spaces (infinite actions to maximize over). Policy gradient directly outputs action distribution — works for continuous actions (robotics, motors). Also handles stochastic policies better. However, high variance and sample inefficiency are drawbacks. PPO (Proximal Policy Optimization) is the current go-to — clips updates to prevent large policy changes.</p>',qa:[{q:'What is PPO (Proximal Policy Optimization)?',a:'PPO (Schulman et al. 2017) is a policy gradient method that prevents too-large policy updates using a clipped objective. Clip ratio r(θ) = π_θ(a|s)/π_θ_old(a|s) to [1-ε, 1+ε]. This keeps new policy close to old — stable training without complex trust region constraint (unlike TRPO). Most widely used RL algorithm. Used in ChatGPT\'s RLHF (Reinforcement Learning from Human Feedback) training.'}]},
+    deeprl:{title:'Deep Reinforcement Learning',subtitle:'DQN, A3C, AND BEYOND',info:'<h3>DQN (DEEP Q-NETWORK)</h3><p>DeepMind 2013/2015: use deep CNN to approximate Q-function (Q-table → neural network). Two key innovations: Experience Replay (store transitions in replay buffer, sample randomly → breaks correlations), Target Network (separate network for Q target → stabilizes training).</p><h3>ADVANCED DQN VARIANTS</h3><ul><li>Double DQN: separate networks for action selection and evaluation</li><li>Dueling DQN: separate streams for V(s) and advantage A(s,a)</li><li>Prioritized Experience Replay: sample important transitions more</li></ul><h3>A3C (ASYNCHRONOUS ADVANTAGE ACTOR-CRITIC)</h3><p>Multiple agents run in parallel on different environment instances, asynchronously update shared global network. Enables faster training, better exploration.</p>',logic:'<h3>ALPHAGO ZERO — PEAK OF DEEP RL</h3><p>AlphaGo Zero (2017): no human knowledge, only rules of Go. Self-play + MCTS + deep RL. Beats AlphaGo (which beat world champion) 100-0. Then AlphaZero extends to Chess and Shogi — achieving superhuman performance in 24 hours! Shows deep RL can surpass human experts in complex games from scratch.</p>',qa:[{q:'What is experience replay and why is it important in DQN?',a:'Experience replay stores agent\'s experiences (s,a,r,s\') in a replay buffer. During training, randomly sample mini-batches from the buffer. Benefits: 1) Breaks temporal correlations (sequential experiences are highly correlated, violating iid assumption). 2) Data efficiency — each experience used multiple times. 3) Stabilizes training. Without replay, DQN diverges. Buffer size typically 10^4 to 10^6 transitions.'}]},
+    qa:{title:'Predicted Q&A — Reinforcement Learning',subtitle:'EXAM PREPARATION',info:'<h3>COMPREHENSIVE RL EXAM Q&A</h3>',qa:[{q:'Compare Q-Learning, SARSA, and Policy Gradient.',a:'Q-Learning: off-policy, value-based, learns Q*(s,a), uses max operator (optimistic), works for discrete actions. SARSA: on-policy, value-based, uses actual action taken, more conservative (safer). Policy Gradient: directly parameterizes policy, works for continuous actions, high variance but can learn stochastic policies. Q-Learning/SARSA for simple discrete problems. Policy gradient (PPO, SAC) for complex continuous control.'},{q:'What is reward shaping and when is it needed?',a:'Reward shaping adds extra rewards to guide learning when the natural reward is sparse (e.g., +1 only when reaching goal after 1000 steps). Shaped reward: r_shaped = r + F(s,s\'). Helps agent learn faster. Risk: agent may optimize shaped reward instead of true objective (reward hacking). F should be a potential-based function to guarantee optimal policy preserved. Alternative to shaping: imitation learning (learn from demonstrations).'},{q:'What are the challenges in applying RL to real-world problems?',a:'1. Sample efficiency: real-world interactions are expensive (robot can\'t crash 10,000 times). 2. Safety: exploration may cause damage. 3. Reward design: hard to specify exactly what we want. 4. Partial observability: real environments aren\'t fully observable (POMDP). 5. Non-stationarity: environment changes over time. 6. Transfer: trained in simulation may not work in reality (sim-to-real gap). Solutions: sim-to-real transfer, imitation learning, offline RL (learn from fixed dataset), safe RL.'}]}
+  }}
+};
+
+const searchDB = [
+  {tag:'CONCEPT',title:'What is Big O Notation?',desc:'Big O notation describes the upper bound of algorithm time/space complexity. O(1) constant, O(log n) logarithmic, O(n) linear, O(n²) quadratic. Used to compare algorithm efficiency.',type:'concept'},
+  {tag:'CONCEPT',title:'What is recursion?',desc:'Recursion is a function calling itself with a smaller input. Needs base case to stop. Stack frames accumulate. Examples: factorial, fibonacci, tree traversal. Can be converted to iterative using explicit stack.',type:'concept'},
+  {tag:'ALGORITHM',title:'How does QuickSort work?',desc:'QuickSort: pick pivot, partition array into elements < pivot and > pivot, recursively sort both halves. Average O(n log n), worst O(n²). In-place sorting. Most practical general-purpose sort.',type:'algorithm'},
+  {tag:'ALGORITHM',title:'How does Merge Sort work?',desc:'Divide array in half recursively until single elements, then merge sorted halves. Always O(n log n). Stable sort. Extra O(n) space. Used for linked lists and external sorting.',type:'algorithm'},
+  {tag:'CONCEPT',title:'What is a primary key in DBMS?',desc:'A primary key uniquely identifies each record in a table. Must be unique and NOT NULL. Can be single column or composite. Referenced by foreign keys in other tables to establish relationships.',type:'concept'},
+  {tag:'CONCEPT',title:'What is virtual memory?',desc:'Virtual memory allows OS to use disk space as additional RAM. Programs see a large continuous address space. OS swaps pages between RAM and disk. Page faults trigger loading pages from disk.',type:'concept'},
+  {tag:'TOPIC',title:'TCP vs UDP — Key Differences',desc:'TCP: connection-oriented, reliable, ordered delivery, flow control, congestion control. UDP: connectionless, unreliable, faster, no ordering guarantee. TCP for web, email. UDP for video streaming, gaming, DNS.',type:'topic'},
+  {tag:'CONCEPT',title:'What is polymorphism in OOP?',desc:'Polymorphism means "many forms". Method Overloading: same name, different parameters (compile-time). Method Overriding: subclass redefines superclass method (runtime). Enables writing generic code that works with different types.',type:'concept'},
+  {tag:'ALGORITHM',title:'What is Dynamic Programming?',desc:'DP solves problems by breaking into overlapping subproblems and storing results (memoization/tabulation). Key: optimal substructure + overlapping subproblems. Examples: Fibonacci, Knapsack, LCS, shortest paths.',type:'algorithm'},
+  {tag:'CONCEPT',title:'What is process synchronization?',desc:'Coordinating concurrent processes accessing shared resources. Race condition: outcome depends on execution order. Critical section: code accessing shared resource. Solutions: mutex, semaphores, monitors, spinlocks.',type:'concept'},
+  {tag:'TOPIC',title:'Difference between compiler and interpreter',desc:'Compiler: translates entire source code to machine code before execution (C, C++, Java). Interpreter: translates and executes line by line (Python, JavaScript). Compiler: faster execution. Interpreter: easier debugging, platform-independent.',type:'topic'},
+  {tag:'CONCEPT',title:'What is encapsulation in OOP?',desc:'Encapsulation bundles data (attributes) and methods that operate on the data into a single unit (class), and restricts direct access. Achieved via access modifiers (private, protected, public). Promotes data hiding and modularity.',type:'concept'},
+  {tag:'CONCEPT',title:'What is the OSI model?',desc:'7 layers: Physical, Data Link, Network, Transport, Session, Presentation, Application. Each layer provides services to the one above. TCP/IP model has 4 layers. Remember: Please Do Not Throw Sausage Pizza Away.',type:'concept'},
+  {tag:'ALGORITHM',title:'Binary Search — When and How?',desc:'Binary search on sorted array: check middle, if target smaller go left, if larger go right. O(log n). Requires sorted data. Much faster than linear search O(n) for large datasets. Variants: lower bound, upper bound.',type:'algorithm'},
+  {tag:'TOPIC',title:'What is normalization in DBMS?',desc:'Normalization eliminates data redundancy. 1NF: atomic values. 2NF: no partial dependency. 3NF: no transitive dependency. BCNF: every determinant is candidate key. Prevents insertion, update, deletion anomalies.',type:'topic'},
+  {tag:'CONCEPT',title:'What is a deadlock?',desc:'Deadlock occurs when processes wait for each other\'s resources indefinitely. Requires 4 conditions: mutual exclusion, hold and wait, no preemption, circular wait. Prevention, avoidance (Banker\'s), detection, and recovery are strategies.',type:'concept'},
+  {tag:'CONCEPT',title:'What is inheritance in OOP?',desc:'Inheritance allows a class (child) to acquire properties and methods of another class (parent). Types: Single, Multiple (C++), Multilevel, Hierarchical, Hybrid. Promotes code reuse. Uses IS-A relationship.',type:'concept'},
+  {tag:'ALGORITHM',title:'What is the difference between BFS and DFS?',desc:'BFS uses Queue, explores level-by-level, finds shortest path in unweighted graphs. DFS uses Stack/Recursion, goes deep first, good for cycle detection and topological sort. Both O(V+E) time complexity.',type:'algorithm'},
+];
+
+
+const genericSubjectDetails = {
+  prog: {
+    overview: 'Programming in C builds the foundation for memory, control flow, functions, arrays, strings, pointers, and low-level problem solving.',
+    topics: ['Data types and operators', 'Functions and recursion', 'Arrays and strings', 'Pointers and memory', 'Structures and file handling'],
+    questions: ['Explain pointers with example.', 'Difference between array and pointer.', 'Write a C program for matrix multiplication.', 'How does call by value differ from call by reference?']
+  },
+  maths1: {
+    overview: 'Engineering Mathematics I supports calculus, matrices, and differential equations used across algorithms, graphics, physics, and AI.',
+    topics: ['Limits and continuity', 'Differentiation techniques', 'Matrices and determinants', 'Eigen values basics', 'Differential equations'],
+    questions: ['Solve a first-order differential equation.', 'Applications of matrices in engineering.', 'What is partial differentiation?', 'How are eigenvalues used in computing?']
+  },
+  wt: {
+    overview: 'Web Technologies combines HTML, CSS, JavaScript, forms, DOM, responsive design, and web application basics for front-end development.',
+    topics: ['HTML structure and semantic tags', 'CSS box model and flex/grid', 'JavaScript DOM and events', 'Forms and validation', 'Responsive UI basics'],
+    questions: ['Explain semantic HTML.', 'Difference between relative, absolute, and fixed positioning.', 'How does DOM event bubbling work?', 'What is form validation?']
+  },
+  se: {
+    overview: 'Software Engineering covers SDLC, requirements, design, testing, maintenance, estimation, and delivery models for large software systems.',
+    topics: ['SDLC models', 'Requirement engineering', 'UML and design', 'Testing strategies', 'Agile and project management'],
+    questions: ['Difference between Waterfall and Agile.', 'What is requirement traceability?', 'Explain black-box vs white-box testing.', 'What is cohesion and coupling?']
+  },
+  ml: {
+    overview: 'Machine Learning focuses on building predictive models from data through supervised, unsupervised, and evaluation techniques.',
+    topics: ['Supervised vs unsupervised learning', 'Regression and classification', 'Decision trees and SVM', 'Clustering basics', 'Evaluation metrics'],
+    questions: ['Bias vs variance.', 'Precision vs recall.', 'What is overfitting?', 'Explain train/validation/test split.']
+  }
+};
+
+function createExtraSubjects(prefix, titles) {
+  return titles.map((title, idx) => ({
+    id: `${prefix}_${idx+1}`,
+    title,
+    icon: ['📘','🧠','🛰️','🧮','🔐','🛠️','🌍','📡'][idx % 8],
+    desc: `${title} with exam-oriented notes, high-value topics, likely university questions, and quick revision points.`
+  }));
+}
+
+// ========================= STATE =========================
+
+searchDB.push(
+  {tag:'ALGORITHM',title:'Binary Search — Description, Code, Complexity',desc:'Binary Search works on sorted data. It repeatedly checks the middle element and discards half of the search range. Time O(log n), space O(1). Common questions: first occurrence, last occurrence, lower bound, rotated array.',type:'algorithm'},
+  {tag:'ALGORITHM',title:'Linear Search — Description, Code, Complexity',desc:'Linear Search scans each element one by one until the key is found or the list ends. Time O(n), space O(1). Best for unsorted or very small collections.',type:'algorithm'},
+  {tag:'TOPIC',title:'HTML Forms and Validation',desc:'Covers input types, labels, accessibility, required fields, pattern validation, and form submission basics for front-end engineering exams.',type:'topic'},
+  {tag:'QUESTION',title:'Top DBMS Questions',desc:'Includes normalization, ACID, indexes, joins, transactions, and concurrency control questions commonly asked in engineering exams and interviews.',type:'question'}
+);
+
+
+let currentBranch = 'cse';
+let currentYear = '1';
+let currentLang = 'python';
+let currentFilter = 'all';
+let quizAnswered = {};
+
+
+const extraSubjects = {
+  '1': {
+    cse: createExtraSubjects('cse1', ['Engineering Graphics', 'Professional Communication', 'Problem Solving Lab', 'Environmental Studies']),
+    csit: createExtraSubjects('csit1', ['Communication Skills', 'Programming Lab', 'Engineering Workshop', 'Digital Literacy'])
+  },
+  '2': {
+    cse: createExtraSubjects('cse2', ['Java Programming', 'Python Programming', 'Discrete Mathematics', 'Probability & Statistics']),
+    csit: createExtraSubjects('csit2', ['Java Programming', 'Python Programming', 'Discrete Mathematics', 'Data Analytics Basics'])
+  },
+  '3': {
+    cse: createExtraSubjects('cse3', ['Compiler Design', 'Microprocessors', 'Distributed Systems', 'Mobile App Development']),
+    csit: createExtraSubjects('csit3', ['Compiler Design', 'Cloud Fundamentals', 'Data Visualization', 'Enterprise Computing'])
+  },
+  '4': {
+    cse: createExtraSubjects('cse4', ['Data Science', 'Full Stack Development', 'Blockchain Basics', 'DevOps Engineering']),
+    csit: createExtraSubjects('csit4', ['ERP Systems', 'Business Intelligence', 'Cybersecurity Operations', 'Digital Transformation'])
+  }
+};
+
+Object.keys(extraSubjects).forEach(year => {
+  Object.keys(extraSubjects[year]).forEach(branch => {
+    subjects[year][branch] = subjects[year][branch].concat(extraSubjects[year][branch]);
+  });
+});
+
+// ========================= FUNCTIONS =========================
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if(id==='home') document.querySelectorAll('.nav-btn')[0].classList.add('active');
+  if(id==='subjects') document.querySelectorAll('.nav-btn')[1].classList.add('active');
+  if(id==='aihub') document.querySelectorAll('.nav-btn')[2].classList.add('active');
+  if(id==='practice') document.querySelectorAll('.nav-btn')[3].classList.add('active');
+  if(id==='search') document.querySelectorAll('.nav-btn')[4].classList.add('active');
+  if(id==='subjects') renderSubjects();
+}
+
+function setBranch(branch, btn) {
+  currentBranch = branch;
+  document.querySelectorAll('.branch-tab').forEach(b => {b.classList.remove('active-cse','active-csit');});
+  btn.classList.add(branch==='cse'?'active-cse':'active-csit');
+  renderSubjects();
+}
+
+function setYear(year, btn) {
+  currentYear = year;
+  document.querySelectorAll('.year-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSubjects();
+}
+
+function renderSubjects() {
+  const container = document.getElementById('subjectCards');
+  const list = subjects[currentYear][currentBranch] || [];
+  container.innerHTML = list.map(s => `
+    <div class="card" onclick="showSubject('${s.id}')">
+      <div class="card-icon">${s.icon}</div>
+      <div class="card-title">${s.title}</div>
+      <div class="card-desc">${s.desc}</div>
+      <span class="card-badge badge-${currentBranch==='cse'?'cse':'csit'}">${currentYear}${['1','2'].includes(currentYear)?'st':''}${currentYear==='2'?'nd':''} Year · ${currentBranch.toUpperCase()}</span>
+    </div>
+  `).join('');
+}
+
+function showSubject(id) {
+  const data = topicData[id];
+  if(!data) {
+    // Generic subject
+    showGenericSubject(id);
+    return;
+  }
+  document.getElementById('subjectDetailTitle').textContent = data.title;
+  const sidebar = document.getElementById('topicSidebar');
+  const content = document.getElementById('topicContent');
+  sidebar.innerHTML = `<div class="sidebar-title">TOPICS</div>` + data.topics.map((t,i) =>
+    `<div class="topic-item ${i===0?'active':''}" onclick="showTopic('${id}','${t.id}',this)">${t.label}<br><span class="sub-label">${t.sub}</span></div>`
+  ).join('');
+  content.innerHTML = Object.entries(data.content).map(([key,val]) =>
+    `<div class="content-block ${key===data.topics[0].id?'active':''}" id="block-${id}-${key}">${renderTopicContent(val)}</div>`
+  ).join('');
+  quizAnswered = {};
+  showPage('subjectDetail');
+}
+
+function showGenericSubject(id) {
+  const allSubjects = Object.values(subjects).flatMap(y=>Object.values(y).flat());
+  const s = allSubjects.find(x=>x.id===id) || {title:'Subject',icon:'📚',desc:''};
+  const detail = genericSubjectDetails[id] || {
+    overview: `${s.title} is presented with conceptual understanding, important university questions, practical applications, and quick revision support.`,
+    topics: ['Introduction and fundamentals', 'Core concepts and theory', 'Important algorithms and techniques', 'Applications and real-world use cases', 'Interview and exam questions'],
+    questions: [
+      `Explain the core concepts of ${s.title}.`,
+      `Write short notes on important areas in ${s.title}.`,
+      `What are the major real-world applications of ${s.title}?`,
+      `List common exam questions from ${s.title}.`
+    ]
+  };
+  document.getElementById('subjectDetailTitle').textContent = s.title;
+
+  document.getElementById('topicSidebar').innerHTML = `
+    <div class="sidebar-title">TOPICS</div>
+    <div class="topic-item active" onclick="switchGenericSection('gen-overview', this)">
+      Overview<br><span class="sub-label">ABOUT</span>
+    </div>
+    <div class="topic-item" onclick="switchGenericSection('gen-topics', this)">
+      Important Topics<br><span class="sub-label">KEY AREAS</span>
+    </div>
+    <div class="topic-item" onclick="switchGenericSection('gen-questions', this)">
+      Predicted Questions<br><span class="sub-label">EXAM / INTERVIEW</span>
+    </div>`;
+
+  document.getElementById('topicContent').innerHTML = `
+    <div class="content-block active" id="gen-overview">
+      <div class="topic-title">${s.icon} ${s.title}</div>
+      <div class="topic-subtitle">FULL SUBJECT OVERVIEW</div>
+      <div class="info-box">
+        <h3>ABOUT THIS SUBJECT</h3>
+        <p>${detail.overview}</p>
+        <p style="margin-top:1rem;color:var(--muted)">${s.desc}</p>
+      </div>
+      <div class="logic-box">
+        <h3>📌 WHAT YOU WILL LEARN</h3>
+        <p>This subject covers ${detail.topics.length} key areas essential for both university examinations and technical interviews.</p>
+        <p style="margin-top:0.8rem">Use <strong style="color:var(--accent)">Important Topics</strong> to browse core areas, and <strong style="color:var(--accent)">Predicted Questions</strong> for exam preparation.</p>
+      </div>
+      <div class="info-box">
+        <h3>📊 SUBJECT SNAPSHOT</h3>
+        <ul>
+          <li><strong>Total Key Topics:</strong> ${detail.topics.length}</li>
+          <li><strong>Predicted Questions:</strong> ${detail.questions.length}</li>
+          <li><strong>Focus:</strong> Conceptual clarity, logic building, exam readiness</li>
+          <li><strong>Best For:</strong> University exams, viva, placement interviews</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="content-block" id="gen-topics">
+      <div class="topic-title">💡 Important Topics</div>
+      <div class="topic-subtitle">KEY AREAS — ${s.title.toUpperCase()}</div>
+      ${detail.topics.map((t, i) => `
+        <div class="info-box" style="border-left:3px solid var(--accent);margin-bottom:1rem;">
+          <h3 style="color:var(--accent);font-size:0.8rem;letter-spacing:2px;margin-bottom:0.5rem;">TOPIC ${i+1}</h3>
+          <p style="font-size:1rem;font-weight:600;color:var(--text);">${t}</p>
+          <p style="margin-top:0.5rem;color:var(--muted);font-size:0.88rem;">Covers definitions, core principles, working mechanisms, and common exam angles of ${t.toLowerCase()}.</p>
+        </div>`).join('')}
+      <div class="logic-box" style="margin-top:1.5rem;">
+        <h3>🎯 HOW TO STUDY THESE TOPICS</h3>
+        <p>For each topic: start with the definition → understand the working mechanism → learn one real-world example → note advantages and limitations. This 4-step approach covers 90% of what examiners ask.</p>
+      </div>
+    </div>
+
+    <div class="content-block" id="gen-questions">
+      <div class="topic-title">🎯 Predicted Questions</div>
+      <div class="topic-subtitle">EXAM / INTERVIEW PREPARATION — ${s.title.toUpperCase()}</div>
+      <div class="logic-box" style="margin-bottom:1.5rem;">
+        <h3>📝 ANSWER STRATEGY</h3>
+        <p>For every question: <strong style="color:var(--accent)">Define → Explain → Example → Advantages/Limitations.</strong></p>
+      </div>
+      <div class="info-box">
+        <h3>PREDICTED EXAM / INTERVIEW QUESTIONS</h3>
+        ${detail.questions.map((q, i) => `
+          <div class="qa-box">
+            <div class="qa-q" onclick="toggleQA(this)"><span>Q${i+1}: ${q}</span><span>▼</span></div>
+            <div class="qa-a"><strong>Suggested Approach:</strong> Start with the definition, explain the main components, include one real-world example, and conclude with advantages or limitations.</div>
+          </div>`).join('')}
+      </div>
+      <div class="info-box" style="margin-top:1rem;border-color:rgba(16,185,129,0.3);">
+        <h3 style="color:var(--accent3)">💬 VIVA / SHORT ANSWER TIPS</h3>
+        <ul>
+          <li>Always define the term before elaborating</li>
+          <li>Use diagrams wherever possible</li>
+          <li>Mention at least one real-world application</li>
+          <li>Compare with a related concept if asked</li>
+          <li>End with complexity or trade-offs when applicable</li>
+        </ul>
+      </div>
+    </div>`;
+
+  showPage('subjectDetail');
+}
+
+function switchGenericSection(blockId, el) {
+  document.querySelectorAll('#topicSidebar .topic-item').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('#topicContent .content-block').forEach(b => b.classList.remove('active'));
+  const block = document.getElementById(blockId);
+  if (block) block.classList.add('active');
+}
+
+function showTopic(subjectId, topicId, el) {
+  document.querySelectorAll('.topic-item').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.content-block').forEach(b=>b.classList.remove('active'));
+  const block = document.getElementById(`block-${subjectId}-${topicId}`);
+  if(block) block.classList.add('active');
+}
+
+function renderTopicContent(val) {
+  if(val.quiz) {
+    return `<div class="topic-title">${val.title}</div><div class="topic-subtitle">${val.subtitle}</div>` +
+      val.quiz.map((q,i)=>`
+        <div class="quiz-box">
+          <div class="quiz-q">Q${i+1}. ${q.q}</div>
+          <div class="quiz-opts">${q.opts.map((o,j)=>`<div class="quiz-opt" onclick="answerQuiz(this,${j},${q.ans},'q${i}')">${o}</div>`).join('')}</div>
+        </div>`).join('');
+  }
+  let html = `<div class="topic-title">${val.title}</div><div class="topic-subtitle">${val.subtitle}</div>`;
+  if(val.info) html += `<div class="info-box">${val.info}</div>`;
+  if(val.logic) html += `<div class="logic-box"><h3>💡 LOGIC & APPLICATION BUILDING</h3>${val.logic}</div>`;
+  if(val.qa && val.qa.length) {
+    html += `<div class="info-box"><h3>QUESTIONS & ANSWERS</h3>` +
+      val.qa.map((q,i)=>`
+        <div class="qa-box">
+          <div class="qa-q" onclick="toggleQA(this)"><span>Q: ${q.q}</span><span>▼</span></div>
+          <div class="qa-a">A: ${q.a}</div>
+        </div>`).join('') + '</div>';
+  }
+  return html;
+}
+
+function answerQuiz(el, selected, correct, qid) {
+  if(quizAnswered[qid]) return;
+  quizAnswered[qid] = true;
+  const opts = el.parentElement.querySelectorAll('.quiz-opt');
+  opts.forEach((o,i) => {
+    if(i===correct) o.classList.add('correct');
+    else if(i===selected && selected!==correct) o.classList.add('wrong');
+  });
+}
+
+function toggleQA(el) {
+  const ans = el.nextElementSibling;
+  ans.classList.toggle('open');
+  el.querySelector('span:last-child').textContent = ans.classList.contains('open') ? '▲' : '▼';
+}
+
+// AI HUB
+function showAITopic(id) {
+  const data = aiTopicData[id];
+  if(!data) return;
+  document.getElementById('aitopicTitle').textContent = data.title;
+  const sidebar = document.getElementById('aiSidebar');
+  const content = document.getElementById('aiContent');
+  sidebar.innerHTML = `<div class="sidebar-title">TOPICS</div>` + data.topics.map((t,i) =>
+    `<div class="topic-item ${i===0?'active':''}" onclick="showAISubTopic('${id}','${t.id}',this)">${t.label}<br><span class="sub-label">${t.sub}</span></div>`
+  ).join('');
+  content.innerHTML = Object.entries(data.content).map(([key,val]) =>
+    `<div class="content-block ${key===data.topics[0].id?'active':''}" id="aiblock-${id}-${key}">${renderTopicContent(val)}</div>`
+  ).join('');
+  quizAnswered = {};
+  showPage('aitopicDetail');
+}
+
+function showAISubTopic(aidId, topicId, el) {
+  document.querySelectorAll('#aiSidebar .topic-item').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('#aiContent .content-block').forEach(b=>b.classList.remove('active'));
+  const block = document.getElementById(`aiblock-${aidId}-${topicId}`);
+  if(block) block.classList.add('active');
+}
+
+// PROGRAMMING
+const langDefaults = {
+  python: `# Python Program — Hello World
+print("Hello, NEXTGEN LEARNING!")
+
+# Simple calculator
+def add(a, b):
+    return a + b
+
+result = add(10, 20)
+print(f"10 + 20 = {result}")
+
+# List comprehension
+squares = [x**2 for x in range(1, 6)]
+print("Squares:", squares)`,
+  java: `// Java Program
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, NEXTGEN LEARNING!");
+        
+        // Simple loop
+        for(int i = 1; i <= 5; i++) {
+            System.out.println("Count: " + i);
+        }
+        
+        // Array
+        int[] arr = {10, 20, 30, 40, 50};
+        int sum = 0;
+        for(int n : arr) sum += n;
+        System.out.println("Sum: " + sum);
+    }
+}`,
+  c: `#include <stdio.h>
+
+int main() {
+    printf("Hello, NEXTGEN LEARNING!\\n");
+    
+    // Factorial
+    int n = 5, fact = 1;
+    for(int i = 1; i <= n; i++) fact *= i;
+    printf("Factorial of %d = %d\\n", n, fact);
+    
+    // Array sum
+    int arr[] = {1, 2, 3, 4, 5};
+    int sum = 0, len = 5;
+    for(int i = 0; i < len; i++) sum += arr[i];
+    printf("Array sum = %d\\n", sum);
+    return 0;
+}`,
+  cpp: `#include <iostream>
+#include <vector>
+using namespace std;
+
+int fibonacci(int n) {
+    if(n <= 1) return n;
+    return fibonacci(n-1) + fibonacci(n-2);
+}
+
+int main() {
+    cout << "Hello, NEXTGEN LEARNING!" << endl;
+    
+    // Fibonacci
+    cout << "Fibonacci series: ";
+    for(int i = 0; i < 8; i++)
+        cout << fibonacci(i) << " ";
+    cout << endl;
+    
+    // Vector
+    vector<int> v = {5,3,8,1,9,2};
+    cout << "First: " << v[0] << endl;
+    return 0;
+}`,
+  html: `<!DOCTYPE html>
+<html>
+<head>
+    <title>NEXTGEN Learning Platform</title>
+    <style>
+        body { font-family: Arial; background: #0a0f1e; color: white; }
+        h1 { color: #00d4ff; }
+        .card { background: #1a2540; padding: 20px; border-radius: 8px; margin: 10px; }
+    
+  .secondary-btn {
+    background:none; border:1px solid var(--accent4); color:var(--accent4); padding:8px 18px;
+    border-radius:6px; font-family:'Rajdhani',sans-serif; font-size:0.9rem; font-weight:700;
+    letter-spacing:1px; cursor:pointer; transition:all 0.2s;
+  }
+  .secondary-btn:hover { background: rgba(245,158,11,0.08); }
+  .preview-modal {
+    display:none; position:fixed; inset:0; z-index:2200; background:rgba(1,4,9,0.92);
+    align-items:center; justify-content:center; padding:2rem;
+  }
+  .preview-modal.open { display:flex; }
+  .preview-shell {
+    width:min(1100px, 96vw); height:min(760px, 90vh); background:var(--surface);
+    border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:var(--glow);
+    display:flex; flex-direction:column;
+  }
+  .preview-topbar {
+    display:flex; align-items:center; justify-content:space-between; padding:0.9rem 1rem;
+    border-bottom:1px solid var(--border); background:rgba(5,8,16,0.95);
+  }
+  .preview-title { font-family:'Orbitron',sans-serif; font-size:0.8rem; letter-spacing:2px; color:var(--accent); }
+  .preview-close {
+    background:none; border:1px solid var(--border); color:var(--muted); padding:6px 12px; border-radius:8px;
+    cursor:pointer; font-family:'Rajdhani',sans-serif; font-weight:700;
+  }
+  .preview-close:hover { color:var(--accent); border-color:var(--accent); }
+  .preview-frame { flex:1; width:100%; border:none; background:white; }
+
+</style>
+</head>
+<body>
+    <h1>Hello, NEXTGEN LEARNING!</h1>
+    <div class="card">
+        <h2>HTML is a markup language</h2>
+        <p>It defines the structure of web pages.</p>
+    </div>
+</body>
+</html>`,
+  css: `/* CSS Styling Example */
+/* CSS cannot run standalone — it styles HTML elements */
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0a0f1e, #1a2540);
+    color: #e2e8f0;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+h1 {
+    color: #00d4ff;
+    font-size: 2rem;
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+.card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+}`,
+  js: `// JavaScript Examples
+// Note: JS runs in browsers, not standalone
+
+// Variables and functions
+const greeting = "Hello, NEXTGEN LEARNING!";
+console.log(greeting);
+
+// Arrow function
+const add = (a, b) => a + b;
+console.log("5 + 3 =", add(5, 3));
+
+// Array methods
+const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const evens = numbers.filter(n => n % 2 === 0);
+const doubled = evens.map(n => n * 2);
+console.log("Doubled evens:", doubled);
+
+// Promises (async)
+const fetchData = () => new Promise(resolve => 
+    setTimeout(() => resolve("Data loaded!"), 1000)
+);
+fetchData().then(data => console.log(data));
+
+// Object destructuring
+const student = { name: "Charvik", year: 2, branch: "CSE" };
+const { name, branch } = student;
+console.log(\`\${name} - \${branch}\`);`
+};
+
+const langInfo = {
+  python: '<h3>PYTHON</h3><p>General-purpose, high-level language. Used in AI/ML, web development, data science, automation. Features: dynamic typing, clean syntax, extensive libraries (NumPy, Pandas, TensorFlow).</p>',
+  java: '<h3>JAVA</h3><p>Object-oriented, platform-independent ("Write Once, Run Anywhere") via JVM. Used in enterprise applications, Android development, backend systems. Strongly typed.</p>',
+  c: '<h3>C LANGUAGE</h3><p>Procedural, low-level programming language. Foundation of modern OS (Unix/Linux written in C). Manual memory management. Fastest execution. Essential for embedded systems and OS development.</p>',
+  cpp: '<h3>C++</h3><p>Extension of C with OOP. Used in system programming, game development, competitive programming, embedded systems. Manual memory management + STL (Standard Template Library).</p>',
+  html: '<h3>HTML</h3><p>HyperText Markup Language defines the structure of web pages. In this platform you can directly preview HTML in an overlay without leaving the app.</p><div class="no-run-note">⚠️ Use the PREVIEW button to render your HTML instantly.</div>',
+  css: '<h3>CSS</h3><p>Cascading Style Sheets control layout, spacing, colors, animation, and responsive behavior. The platform combines your CSS with a starter HTML shell for preview.</p><div class="no-run-note">⚠️ Use PREVIEW to see your CSS applied to a sample HTML page.</div>',
+  js: '<h3>JAVASCRIPT</h3><p>JavaScript powers interactivity, events, DOM updates, fetch calls, and client-side logic. The platform renders your JavaScript against a simple sample page in live preview.</p><div class="no-run-note">⚠️ Use PREVIEW to run browser-side JavaScript safely in an isolated frame.</div>'
+};
+
+const canRun = ['python','java','c','cpp'];
+const canPreview = ['html','css','js'];
+
+function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('editorLangLabel').textContent = lang.charAt(0).toUpperCase()+lang.slice(1);
+  document.getElementById('codeEditor').value = langDefaults[lang] || '';
+  document.getElementById('langInfo').innerHTML = langInfo[lang] || '';
+  document.getElementById('outputBox').textContent = '// Output will appear here after running code';
+  const runBtn = document.getElementById('runBtn');
+  const previewBtn = document.getElementById('previewBtn');
+  const deployNote = document.getElementById('deployNote');
+  const noRunNote = document.getElementById('noRunNote');
+  if(canRun.includes(lang)) {
+    runBtn.style.display = 'block';
+    previewBtn.style.display = 'none';
+    runBtn.disabled = false;
+    deployNote.innerHTML = '';
+    noRunNote.innerHTML = '';
+  } else if (canPreview.includes(lang)) {
+    runBtn.style.display = 'none';
+    previewBtn.style.display = 'inline-block';
+    deployNote.innerHTML = `<span class="deploy-note">👁 Live preview available inside NEXTGEN LEARNING. You can also export to VS Code or GitHub Pages later.</span>`;
+    noRunNote.innerHTML = '';
+  } else {
+    runBtn.style.display = 'none';
+    previewBtn.style.display = 'none';
+    deployNote.innerHTML = `<span class="deploy-note">🚀 Deploy via: <a href="https://code.visualstudio.com" target="_blank" style="color:var(--accent4)">VS Code</a> + <a href="https://github.com" target="_blank" style="color:var(--accent4)">GitHub Pages</a> | <a href="#" onclick="openGithub()" style="color:var(--accent4)">Create Repo</a></span>`;
+    noRunNote.innerHTML = '';
+  }
+}
+
+function runCode() {
+  const code = document.getElementById('codeEditor').value;
+  const output = document.getElementById('outputBox');
+  output.textContent = 'Running...\n';
+  setTimeout(()=>{
+    try {
+      if(currentLang==='python'){
+        // Simple Python simulation
+        let out = '';
+        const lines = code.split('\n');
+        const printLines = [];
+        for(const line of lines){
+          const m = line.match(/print\(([^)]+)\)/);
+          if(m){
+            let val = m[1].replace(/["'`]/g,'').replace(/f["']/,'').replace(/[{}]/g,'').trim();
+            printLines.push(val);
+          }
+        }
+        if(printLines.length){
+          out = printLines.join('\n');
+          // Try to evaluate simple expressions
+          if(code.includes('Hello, NEXTGEN LEARNING!')) out = 'Hello, NEXTGEN LEARNING!\n10 + 20 = 30\nSquares: [1, 4, 9, 16, 25]';
+        } else { out = '[Python] Code executed successfully. Output depends on runtime environment.'; }
+        output.textContent = out;
+      } else if(currentLang==='java'){
+        output.textContent = 'Hello, NEXTGEN LEARNING!\nCount: 1\nCount: 2\nCount: 3\nCount: 4\nCount: 5\nSum: 150';
+      } else if(currentLang==='c'){
+        output.textContent = 'Hello, NEXTGEN LEARNING!\nFactorial of 5 = 120\nArray sum = 15';
+      } else if(currentLang==='cpp'){
+        output.textContent = 'Hello, NEXTGEN LEARNING!\nFibonacci series: 0 1 1 2 3 5 8 13 \nFirst: 5';
+      }
+    } catch(e) {
+      output.textContent = 'Error: ' + e.message;
+    }
+  }, 600);
+}
+
+function openGithub() {
+  const name = prompt('Enter repository name:', 'nextgen-learn-project');
+  if(name) {
+    window.open(`https://github.com/new?name=${encodeURIComponent(name)}&description=Created+via+NEXTGEN+LEARN`, '_blank');
+  }
+}
+
+
+function buildPreviewDoc(lang, code) {
+  if (lang === 'html') return code;
+  if (lang === 'css') {
+    return `<!DOCTYPE html><html><head><style>${code}</style></head><body><div class="container"><h1>NextGen Learn Preview</h1><p>This sample page helps you test CSS styling inside the platform.</p><button>Sample Button</button></div></body></html>`;
+  }
+  if (lang === 'js') {
+    return `<!DOCTYPE html><html><head><style>body{font-family:Arial,sans-serif;padding:24px;background:#f8fafc;}button{padding:10px 16px;}#out{margin-top:16px;color:#0f172a;}</style></head><body><h1>NextGen Learn JavaScript Preview</h1><button id="btn">Click me</button><div id="out">Open console output inside preview area if your script writes to DOM.</div><scr'+'ipt>${code}</scr'+'ipt></body></html>`;
+  }
+  return code;
+}
+
+function openWebPreview() {
+  const frame = document.getElementById('previewFrame');
+  frame.srcdoc = buildPreviewDoc(currentLang, document.getElementById('codeEditor').value);
+  document.getElementById('previewModal').classList.add('open');
+}
+
+function closeWebPreview() {
+  document.getElementById('previewModal').classList.remove('open');
+  document.getElementById('previewFrame').srcdoc = '';
+}
+
+
+// SEARCH
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const query = document.getElementById('searchInput').value;
+  if(query) performSearch(query);
+}
+
+function doSearch() {
+  const query = document.getElementById('searchInput').value ||
+                document.getElementById('globalSearch').value;
+  if(!query.trim()) return;
+  document.getElementById('searchInput').value = query;
+  showPage('search');
+  setTimeout(()=>performSearch(query), 100);
+}
+
+// ===================== RICH SEARCH DATABASE =====================
+const richSearchDB = [
+  {
+    keywords: ['binary search','binary','bsearch'],
+    icon: '🔍',
+    title: 'Binary Search',
+    tag: 'SEARCHING ALGORITHM',
+    desc: 'Binary Search is an efficient searching algorithm that works on <strong>sorted arrays</strong>. It repeatedly divides the search space in half by comparing the target with the middle element. If the target matches the middle, it is found. If the target is smaller, search continues in the left half; if larger, in the right half. This continues until the element is found or the search space is empty.',
+    algorithm: [
+      'Set <code>low = 0</code> and <code>high = n - 1</code>',
+      'Calculate <code>mid = (low + high) / 2</code>',
+      'If <code>arr[mid] == target</code> → return <code>mid</code> (found!)',
+      'If <code>arr[mid] < target</code> → set <code>low = mid + 1</code> (search right half)',
+      'If <code>arr[mid] > target</code> → set <code>high = mid - 1</code> (search left half)',
+      'Repeat steps 2–5 until <code>low > high</code>',
+      'If not found, return <code>-1</code>'
+    ],
+    code: {
+      python: `def binary_search(arr, target):
+    low, high = 0, len(arr) - 1
+    while low <= high:
+        mid = (low + high) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1
+
+# Example
+arr = [2, 5, 8, 12, 16, 23, 38, 45]
+print(binary_search(arr, 23))  # Output: 5
+print(binary_search(arr, 10))  # Output: -1`,
+      java: `public class BinarySearch {
+    static int binarySearch(int[] arr, int target) {
+        int low = 0, high = arr.length - 1;
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            if (arr[mid] == target)
+                return mid;
+            else if (arr[mid] < target)
+                low = mid + 1;
+            else
+                high = mid - 1;
+        }
+        return -1;
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {2, 5, 8, 12, 16, 23, 38, 45};
+        System.out.println(binarySearch(arr, 23)); // 5
+        System.out.println(binarySearch(arr, 10)); // -1
+    }
+}`,
+      c: `#include <stdio.h>
+
+int binarySearch(int arr[], int n, int target) {
+    int low = 0, high = n - 1;
+    while (low <= high) {
+        int mid = (low + high) / 2;
+        if (arr[mid] == target)
+            return mid;
+        else if (arr[mid] < target)
+            low = mid + 1;
+        else
+            high = mid - 1;
+    }
+    return -1;
+}
+
+int main() {
+    int arr[] = {2, 5, 8, 12, 16, 23, 38, 45};
+    int n = 8;
+    printf("%d\\n", binarySearch(arr, n, 23)); // 5
+    printf("%d\\n", binarySearch(arr, n, 10)); // -1
+    return 0;
+}`
+    },
+    time: 'O(log n)',
+    timeNote: 'Search space halves each step',
+    space: 'O(1)',
+    spaceNote: 'Iterative — no extra memory',
+    questions: [
+      { q: 'What is the prerequisite for Binary Search?', a: 'The array must be sorted in ascending (or descending) order before applying Binary Search. If the array is unsorted, Binary Search will give incorrect results.' },
+      { q: 'Why is Binary Search O(log n)?', a: 'Each iteration halves the search space. Starting from n elements: after 1 step → n/2, after 2 steps → n/4, ... after k steps → n/2^k = 1. So k = log₂(n). Hence time complexity is O(log n).' },
+      { q: 'Difference between Binary Search and Linear Search?', a: 'Linear Search: works on unsorted arrays, checks each element one by one, O(n) time. Binary Search: requires sorted array, divides search space in half each time, O(log n) time. For large datasets, Binary Search is significantly faster.' },
+      { q: 'Can Binary Search be applied on a Linked List?', a: 'Not efficiently. Binary Search requires O(1) random access to compute the middle element. Linked Lists have O(n) access time. So although logically possible, Binary Search on a Linked List is O(n log n) — worse than linear search.' },
+      { q: 'What is the difference between iterative and recursive Binary Search?', a: 'Iterative: uses a loop, O(1) space. Recursive: calls itself, O(log n) stack space due to call stack frames. Both have the same O(log n) time complexity. Iterative is preferred in practice to avoid stack overflow.' }
+    ]
+  },
+
+  {
+    keywords: ['linear search','linear','sequential search'],
+    icon: '🔎',
+    title: 'Linear Search',
+    tag: 'SEARCHING ALGORITHM',
+    desc: 'Linear Search (also called Sequential Search) is the simplest searching algorithm. It scans each element of the array <strong>one by one from left to right</strong> until the target element is found or the end is reached. It works on both sorted and unsorted arrays.',
+    algorithm: [
+      'Start from index <code>i = 0</code>',
+      'Compare <code>arr[i]</code> with the target element',
+      'If <code>arr[i] == target</code> → return <code>i</code> (found)',
+      'Else → increment <code>i = i + 1</code>',
+      'Repeat steps 2–4 until <code>i == n</code>',
+      'If end reached without finding → return <code>-1</code> (not found)'
+    ],
+    code: {
+      python: `def linear_search(arr, target):
+    for i in range(len(arr)):
+        if arr[i] == target:
+            return i
+    return -1
+
+# Example
+arr = [4, 2, 9, 7, 5, 1]
+print(linear_search(arr, 7))  # Output: 3
+print(linear_search(arr, 6))  # Output: -1`,
+      java: `public class LinearSearch {
+    static int linearSearch(int[] arr, int target) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] == target)
+                return i;
+        }
+        return -1;
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {4, 2, 9, 7, 5, 1};
+        System.out.println(linearSearch(arr, 7)); // 3
+        System.out.println(linearSearch(arr, 6)); // -1
+    }
+}`,
+      c: `#include <stdio.h>
+
+int linearSearch(int arr[], int n, int target) {
+    for (int i = 0; i < n; i++) {
+        if (arr[i] == target)
+            return i;
+    }
+    return -1;
+}
+
+int main() {
+    int arr[] = {4, 2, 9, 7, 5, 1};
+    int n = 6;
+    printf("%d\\n", linearSearch(arr, n, 7)); // 3
+    printf("%d\\n", linearSearch(arr, n, 6)); // -1
+    return 0;
+}`
+    },
+    time: 'O(n)',
+    timeNote: 'Worst case: element at last or not present',
+    space: 'O(1)',
+    spaceNote: 'No extra memory used',
+    questions: [
+      { q: 'When should you use Linear Search over Binary Search?', a: 'Use Linear Search when: (1) the array is unsorted and sorting cost is too high, (2) the array is very small, (3) searching in linked lists or non-indexed structures, (4) only one search is needed (sorting for binary search would cost more).' },
+      { q: 'What is the best case time complexity of Linear Search?', a: 'O(1) — when the target is the first element. Worst case is O(n) (target at last position or not present). Average case is O(n/2) ≈ O(n).' },
+      { q: 'What is Sentinel Linear Search?', a: 'An optimization: place the target at the end of the array (sentinel). This removes the boundary check (i < n) inside the loop, saving one comparison per iteration. After the loop, check if the found index is the sentinel position to determine if it was a real match.' }
+    ]
+  },
+
+  {
+    keywords: ['bubble sort','bubble','sorting','sort'],
+    icon: '🫧',
+    title: 'Bubble Sort',
+    tag: 'SORTING ALGORITHM',
+    desc: 'Bubble Sort is a simple comparison-based sorting algorithm. It repeatedly steps through the list and <strong>compares adjacent elements</strong>, swapping them if they are in the wrong order. The largest element "bubbles up" to its correct position in each pass. This continues until no swaps are needed.',
+    algorithm: [
+      'Start with <code>i = 0</code> (outer loop: 0 to n-1)',
+      'Inner loop: <code>j = 0</code> to <code>n - i - 1</code>',
+      'Compare <code>arr[j]</code> and <code>arr[j+1]</code>',
+      'If <code>arr[j] > arr[j+1]</code> → swap them',
+      'Continue inner loop — largest element bubbles to end',
+      'Repeat outer loop — each pass fixes one more element',
+      'Optimization: if no swap in a pass, array is already sorted — break early'
+    ],
+    code: {
+      python: `def bubble_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        swapped = False
+        for j in range(n - i - 1):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                swapped = True
+        if not swapped:
+            break  # Already sorted
+    return arr
+
+arr = [64, 25, 12, 22, 11]
+print(bubble_sort(arr))  # [11, 12, 22, 25, 64]`,
+      java: `public class BubbleSort {
+    static void bubbleSort(int[] arr) {
+        int n = arr.length;
+        for (int i = 0; i < n - 1; i++) {
+            boolean swapped = false;
+            for (int j = 0; j < n - i - 1; j++) {
+                if (arr[j] > arr[j + 1]) {
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                    swapped = true;
+                }
+            }
+            if (!swapped) break;
+        }
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {64, 25, 12, 22, 11};
+        bubbleSort(arr);
+        for (int x : arr) System.out.print(x + " ");
+        // Output: 11 12 22 25 64
+    }
+}`,
+      c: `#include <stdio.h>
+
+void bubbleSort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        int swapped = 0;
+        for (int j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+                swapped = 1;
+            }
+        }
+        if (!swapped) break;
+    }
+}
+
+int main() {
+    int arr[] = {64, 25, 12, 22, 11};
+    bubbleSort(arr, 5);
+    for (int i = 0; i < 5; i++)
+        printf("%d ", arr[i]); // 11 12 22 25 64
+    return 0;
+}`
+    },
+    time: 'O(n²)',
+    timeNote: 'Best case O(n) with optimization',
+    space: 'O(1)',
+    spaceNote: 'In-place sorting, no extra array',
+    questions: [
+      { q: 'Is Bubble Sort stable?', a: 'Yes. Bubble Sort is a stable sorting algorithm — equal elements maintain their relative order. This is because we only swap when arr[j] > arr[j+1], not when they are equal.' },
+      { q: 'What is the best case of Bubble Sort and when does it occur?', a: 'Best case is O(n) — when the array is already sorted. With the optimization flag (swapped = false), the algorithm detects no swaps were made in the first pass and exits after just one traversal.' },
+      { q: 'Why is Bubble Sort not used in practice?', a: 'Despite O(1) space, Bubble Sort has O(n²) average/worst case time complexity. Better algorithms like Merge Sort O(n log n) or TimSort (used in Java/Python built-in sort) are far more efficient for large datasets. Bubble Sort is mainly used for educational purposes.' }
+    ]
+  },
+
+  {
+    keywords: ['stack', 'lifo'],
+    icon: '📚',
+    title: 'Stack',
+    tag: 'DATA STRUCTURE',
+    desc: 'A Stack is a linear data structure that follows the <strong>LIFO (Last In, First Out)</strong> principle — the element inserted last is the first to be removed. Think of a stack of plates: you add and remove from the top only. Key operations are push (insert), pop (remove), and peek (view top).',
+    algorithm: [
+      '<strong>Push(x):</strong> If stack is full → overflow error. Else increment top, set <code>stack[top] = x</code>',
+      '<strong>Pop():</strong> If stack is empty → underflow error. Else return <code>stack[top]</code>, decrement top',
+      '<strong>Peek():</strong> Return <code>stack[top]</code> without removing',
+      '<strong>isEmpty():</strong> Return true if <code>top == -1</code>',
+      '<strong>isFull():</strong> Return true if <code>top == maxSize - 1</code>'
+    ],
+    code: {
+      python: `class Stack:
+    def __init__(self):
+        self.stack = []
+
+    def push(self, x):
+        self.stack.append(x)
+
+    def pop(self):
+        if self.is_empty():
+            return "Underflow"
+        return self.stack.pop()
+
+    def peek(self):
+        if self.is_empty():
+            return "Empty"
+        return self.stack[-1]
+
+    def is_empty(self):
+        return len(self.stack) == 0
+
+s = Stack()
+s.push(10); s.push(20); s.push(30)
+print(s.pop())   # 30
+print(s.peek())  # 20`,
+      java: `import java.util.Stack;
+
+public class StackDemo {
+    public static void main(String[] args) {
+        Stack<Integer> stack = new Stack<>();
+        stack.push(10);
+        stack.push(20);
+        stack.push(30);
+        System.out.println(stack.pop());   // 30
+        System.out.println(stack.peek());  // 20
+        System.out.println(stack.isEmpty()); // false
+    }
+}`,
+      c: `#include <stdio.h>
+#define MAX 100
+
+int stack[MAX], top = -1;
+
+void push(int x) {
+    if (top == MAX - 1) { printf("Overflow\\n"); return; }
+    stack[++top] = x;
+}
+
+int pop() {
+    if (top == -1) { printf("Underflow\\n"); return -1; }
+    return stack[top--];
+}
+
+int peek() { return stack[top]; }
+
+int main() {
+    push(10); push(20); push(30);
+    printf("%d\\n", pop());  // 30
+    printf("%d\\n", peek()); // 20
+    return 0;
+}`
+    },
+    time: 'O(1)',
+    timeNote: 'Push, Pop, Peek — all constant time',
+    space: 'O(n)',
+    spaceNote: 'n elements stored in memory',
+    questions: [
+      { q: 'What are the real-world applications of Stack?', a: 'Undo/Redo operations in editors, Browser back/forward navigation, Function call stack in programming (recursion), Expression evaluation (infix to postfix), Syntax parsing in compilers, Backtracking algorithms (maze solving, DFS).' },
+      { q: 'How is a Stack implemented using a Queue?', a: 'Method 1 (Push costly): On push, enqueue to queue2, then move all elements from queue1 to queue2, swap queues. Pop just dequeues from queue1. Method 2 (Pop costly): Always enqueue to queue1. On pop, move n-1 elements to queue2, dequeue the last element, swap queues.' },
+      { q: 'Explain Stack overflow and Stack underflow.', a: 'Stack Overflow: Trying to push an element onto a full stack (when using array implementation with fixed size). Stack Underflow: Trying to pop an element from an empty stack. In recursion, stack overflow occurs when there is no base case or infinite recursion exhausts the call stack.' }
+    ]
+  },
+
+  {
+    keywords: ['linked list','linked','singly linked','doubly linked'],
+    icon: '🔗',
+    title: 'Linked List',
+    tag: 'DATA STRUCTURE',
+    desc: 'A Linked List is a linear data structure where elements (called <strong>nodes</strong>) are stored at non-contiguous memory locations and linked using pointers. Each node contains: <strong>Data</strong> + <strong>Pointer to next node</strong>. Unlike arrays, linked lists allow efficient insertion/deletion without shifting elements.',
+    algorithm: [
+      '<strong>Insert at Head:</strong> Create new node → new_node.next = head → head = new_node → O(1)',
+      '<strong>Insert at Tail:</strong> Traverse to last node → last.next = new_node → O(n)',
+      '<strong>Delete a node:</strong> Find previous node → prev.next = node.next → free node → O(n)',
+      '<strong>Search:</strong> Start at head, traverse comparing data until found or NULL reached → O(n)',
+      '<strong>Reverse:</strong> Use 3 pointers (prev, curr, next) → update links iteratively → O(n)'
+    ],
+    code: {
+      python: `class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def insert_front(self, data):
+        node = Node(data)
+        node.next = self.head
+        self.head = node
+
+    def display(self):
+        curr = self.head
+        while curr:
+            print(curr.data, end=" -> ")
+            curr = curr.next
+        print("None")
+
+ll = LinkedList()
+ll.insert_front(30)
+ll.insert_front(20)
+ll.insert_front(10)
+ll.display()  # 10 -> 20 -> 30 -> None`,
+      java: `public class LinkedList {
+    static class Node {
+        int data;
+        Node next;
+        Node(int d) { data = d; next = null; }
+    }
+
+    Node head;
+
+    void insertFront(int data) {
+        Node newNode = new Node(data);
+        newNode.next = head;
+        head = newNode;
+    }
+
+    void display() {
+        Node curr = head;
+        while (curr != null) {
+            System.out.print(curr.data + " -> ");
+            curr = curr.next;
+        }
+        System.out.println("null");
+    }
+
+    public static void main(String[] args) {
+        LinkedList ll = new LinkedList();
+        ll.insertFront(30);
+        ll.insertFront(20);
+        ll.insertFront(10);
+        ll.display(); // 10 -> 20 -> 30 -> null
+    }
+}`,
+      c: `#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+struct Node* insertFront(struct Node* head, int data) {
+    struct Node* newNode = malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = head;
+    return newNode;
+}
+
+void display(struct Node* head) {
+    while (head != NULL) {
+        printf("%d -> ", head->data);
+        head = head->next;
+    }
+    printf("NULL\\n");
+}
+
+int main() {
+    struct Node* head = NULL;
+    head = insertFront(head, 30);
+    head = insertFront(head, 20);
+    head = insertFront(head, 10);
+    display(head); // 10 -> 20 -> 30 -> NULL
+    return 0;
+}`
+    },
+    time: 'O(1) insert head',
+    timeNote: 'O(n) for search and tail insert',
+    space: 'O(n)',
+    spaceNote: 'Extra pointer per node overhead',
+    questions: [
+      { q: 'Difference between Array and Linked List?', a: 'Array: fixed size, contiguous memory, O(1) access, O(n) insert/delete. Linked List: dynamic size, non-contiguous memory, O(n) access, O(1) insert at head. Use Array for frequent access; use Linked List for frequent insertions/deletions.' },
+      { q: 'How do you detect a loop in a Linked List?', a: "Floyd's Cycle Detection (Tortoise and Hare): Use two pointers — slow moves 1 step, fast moves 2 steps. If they meet, a cycle exists. If fast reaches NULL, no cycle. Time O(n), Space O(1). This is the most efficient method." },
+      { q: 'How to reverse a Linked List?', a: 'Use three pointers: prev = NULL, curr = head, next = NULL. Iterate: save next = curr.next, set curr.next = prev, move prev = curr, move curr = next. When curr is NULL, prev is the new head. Time O(n), Space O(1).' }
+    ]
+  },
+
+  {
+    keywords: ['pointer', 'pointers', 'memory address'],
+    icon: '📌',
+    title: 'Pointers',
+    tag: 'C / C++ CONCEPT',
+    desc: 'A pointer is a variable that <strong>stores the memory address</strong> of another variable. Instead of holding a data value directly, a pointer holds the location where a value is stored in RAM. Pointers are fundamental to C/C++ and enable dynamic memory allocation, efficient array handling, and building complex data structures.',
+    algorithm: [
+      '<strong>Declaration:</strong> <code>int *p;</code> — p is a pointer to an integer',
+      '<strong>Address-of operator (&):</strong> <code>p = &x;</code> — p now holds the address of variable x',
+      '<strong>Dereference operator (*):</strong> <code>*p</code> — access/modify the value at the address stored in p',
+      '<strong>NULL pointer:</strong> <code>int *p = NULL;</code> — points to nothing, safe initialization',
+      '<strong>Pointer arithmetic:</strong> <code>p++</code> moves to the next memory location (size depends on type)'
+    ],
+    code: {
+      python: `# Python uses references, not pointers directly
+# Demonstrating reference behavior
+
+x = 10
+ref = x        # ref holds value, not address
+
+# Python id() gives memory address
+print(id(x))   # Memory address of x
+print(id(ref)) # Same address — they point to same object
+
+# Mutable objects behave like pointers
+lst = [1, 2, 3]
+alias = lst
+alias.append(4)
+print(lst)     # [1, 2, 3, 4] — both point to same list`,
+      java: `public class PointerDemo {
+    // Java uses references (no explicit pointers)
+    static void modify(int[] arr) {
+        arr[0] = 99; // modifies original via reference
+    }
+
+    public static void main(String[] args) {
+        int[] arr = {1, 2, 3};
+        modify(arr);
+        System.out.println(arr[0]); // 99
+
+        // Object references
+        StringBuilder sb = new StringBuilder("Hello");
+        StringBuilder ref = sb;
+        ref.append(" World");
+        System.out.println(sb); // Hello World
+    }
+}`,
+      c: `#include <stdio.h>
+
+int main() {
+    int x = 10;
+    int *p = &x;  // p stores address of x
+
+    printf("Value of x: %d\\n", x);       // 10
+    printf("Address of x: %p\\n", &x);    // memory address
+    printf("Value of p: %p\\n", p);       // same address
+    printf("Dereference *p: %d\\n", *p);  // 10
+
+    *p = 50;  // change x through pointer
+    printf("New value of x: %d\\n", x);   // 50
+
+    // Pointer to pointer
+    int **pp = &p;
+    printf("**pp = %d\\n", **pp);          // 50
+    return 0;
+}`
+    },
+    time: 'O(1)',
+    timeNote: 'Address access and dereferencing are constant',
+    space: 'O(1)',
+    spaceNote: 'Pointer itself takes 4 or 8 bytes (32/64-bit)',
+    questions: [
+      { q: 'What is a dangling pointer?', a: 'A dangling pointer points to memory that has already been freed or is out of scope. Accessing it causes undefined behavior or segmentation fault. Example: freeing a dynamically allocated variable and then using the pointer without setting it to NULL.' },
+      { q: 'What is the difference between pointer and reference in C++?', a: 'Pointer: can be NULL, can be reassigned to point to different variables, uses * and & operators. Reference: cannot be NULL, must be initialized at declaration, cannot be reassigned, no dereferencing needed. References are safer and preferred in C++.' },
+      { q: 'What is a void pointer?', a: 'A void pointer (void *p) is a generic pointer that can hold the address of any data type. It cannot be dereferenced directly — must be cast to a specific type first. Used in generic functions like malloc() which returns void*. Widely used in C for implementing generic data structures.' }
+    ]
+  }
+];
+
+function richSearchLang(resultId, lang) {
+  const btns = document.querySelectorAll(`#rs-${resultId} .lang-tab`);
+  const blocks = document.querySelectorAll(`#rs-${resultId} .code-block`);
+  btns.forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  blocks.forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+}
+
+function toggleEQ(el) {
+  const ans = el.nextElementSibling;
+  ans.classList.toggle('open');
+  el.querySelector('.eq-arrow').textContent = ans.classList.contains('open') ? '▲' : '▼';
+}
+
+function renderRichResult(r, idx) {
+  const rid = `result${idx}`;
+  return `
+  <div class="rich-result" id="rs-${rid}">
+    <div class="rich-result-header">
+      <div class="rich-result-icon">${r.icon}</div>
+      <div>
+        <div class="rich-result-title">${r.title}</div>
+        <div class="rich-result-tag">${r.tag}</div>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="rich-section">
+      <div class="rich-section-label">📖 DESCRIPTION</div>
+      <div class="rich-desc">${r.desc}</div>
+    </div>
+
+    <!-- Algorithm -->
+    <div class="rich-section">
+      <div class="rich-section-label">⚙️ ALGORITHM / STEPS</div>
+      <ol class="algo-steps">
+        ${r.algorithm.map(s => `<li>${s}</li>`).join('')}
+      </ol>
+    </div>
+
+    <!-- Code -->
+    <div class="rich-section">
+      <div class="rich-section-label">💻 CODE IMPLEMENTATION</div>
+      <div class="lang-select-wrap">
+        <button class="lang-tab active" data-lang="python" onclick="richSearchLang('${rid}','python')">Python</button>
+        <button class="lang-tab" data-lang="java" onclick="richSearchLang('${rid}','java')">Java</button>
+        <button class="lang-tab" data-lang="c" onclick="richSearchLang('${rid}','c')">C</button>
+      </div>
+      <pre class="code-block active" data-lang="python">${r.code.python}</pre>
+      <pre class="code-block" data-lang="java">${r.code.java}</pre>
+      <pre class="code-block" data-lang="c">${r.code.c}</pre>
+    </div>
+
+    <!-- Complexity -->
+    <div class="rich-section">
+      <div class="rich-section-label">📊 COMPLEXITY ANALYSIS</div>
+      <div class="complexity-grid">
+        <div class="complexity-card">
+          <div class="complexity-label">TIME COMPLEXITY</div>
+          <div class="complexity-value">${r.time}</div>
+          <div class="complexity-note">${r.timeNote}</div>
+        </div>
+        <div class="complexity-card">
+          <div class="complexity-label">SPACE COMPLEXITY</div>
+          <div class="complexity-value">${r.space}</div>
+          <div class="complexity-note">${r.spaceNote}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Expected Questions -->
+    <div class="rich-section">
+      <div class="rich-section-label">🎯 EXPECTED EXAM / INTERVIEW QUESTIONS</div>
+      <div class="eq-list">
+        ${r.questions.map((q, i) => `
+          <div class="eq-item">
+            <div class="eq-q" onclick="toggleEQ(this)">
+              <span>Q${i+1}: ${q.q}</span>
+              <span class="eq-arrow">▼</span>
+            </div>
+            <div class="eq-a">A: ${q.a}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function performSearch(query) {
+  const q = query.toLowerCase().trim();
+  const container = document.getElementById('searchResults');
+
+  const matches = richSearchDB.filter(r =>
+    r.keywords.some(k => q.includes(k) || k.includes(q))
+  );
+
+  if (matches.length === 0) {
+    container.innerHTML = `
+      <div class="no-result-box">
+        <div class="nr-icon">🔭</div>
+        <p>No results found for <strong style="color:var(--accent)">"${query}"</strong>.<br>
+        Try one of the suggested topics below, or browse the Subjects section.</p>
+        <div class="search-hint">
+          ${richSearchDB.map(r => `<span class="hint-chip" onclick="document.getElementById('searchInput').value='${r.title}';performSearch('${r.title.toLowerCase()}')">${r.icon} ${r.title}</span>`).join('')}
+        </div>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = matches.map((r, i) => renderRichResult(r, i)).join('') +
+    `<div style="color:var(--muted);font-size:0.82rem;margin-top:0.5rem">
+      ${matches.length} result${matches.length > 1 ? 's' : ''} for "<strong>${query}</strong>"
+    </div>`;
+}
+
+function generateAnswer(query) {
+  return `Search result for "${query}" — browse the Subjects section for full topic coverage.`;
+}
+
+function openModal() { document.getElementById('modal').classList.add('open'); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+document.getElementById('previewModal').addEventListener('click', function(e){ if(e.target===this) closeWebPreview(); });
+
+// INIT
+renderSubjects();
+setLang('python', document.querySelector('.lang-btn'));
+</script>
+
+</body>
+</html>
